@@ -15,7 +15,7 @@ pub struct Enum {
 
 impl Enum {
     /// Return a enum definition with the provided name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Enum {
             type_def: TypeDef::new(name),
             variants: vec![],

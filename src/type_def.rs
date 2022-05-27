@@ -21,7 +21,7 @@ pub struct TypeDef {
 
 impl TypeDef {
     /// Return a structure definition with the provided name
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         TypeDef {
             ty: Type::new(name),
             vis: None,

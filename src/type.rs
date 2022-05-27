@@ -11,9 +11,9 @@ pub struct Type {
 
 impl Type {
     /// Return a new type with the given name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Type {
-            name: name.to_string(),
+            name: name.into(),
             generics: vec![],
         }
     }

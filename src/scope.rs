@@ -180,7 +180,7 @@ impl Scope {
     }
 
     /// Push a new struct definition, returning a mutable reference to it.
-    pub fn new_enum(&mut self, name: &str) -> &mut Enum {
+    pub fn new_enum(&mut self, name: impl Into<String>) -> &mut Enum {
         self.push_enum(Enum::new(name));
 
         match *self.items.last_mut().unwrap() {

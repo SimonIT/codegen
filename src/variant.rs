@@ -9,15 +9,20 @@ use crate::r#type::Type;
 #[derive(Debug, Clone)]
 pub struct Variant {
     name: String,
+
     fields: Fields,
+
+    /// Variant attributes, e.g., `#[serde(rename = "variant")]`.
+    attributes: Vec<String>,
 }
 
 impl Variant {
     /// Return a new enum variant with the given name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Variant {
-            name: name.to_string(),
+            name: name.into(),
             fields: Fields::Empty,
+            attributes: Vec::new(),
         }
     }
 
@@ -36,8 +41,17 @@ impl Variant {
         self
     }
 
+    /// Add an attribute to the variant.
+    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
+        self.attributes.push(attr.into());
+        self
+    }
+
     /// Formats the variant using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        for attr in &self.attributes {
+            write!(fmt, "#[{}]\n", attr)?;
+        }
         write!(fmt, "{}", self.name)?;
         self.fields.fmt(fmt)?;
         write!(fmt, ",\n")?;
