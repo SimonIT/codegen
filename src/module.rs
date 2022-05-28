@@ -166,6 +166,11 @@ impl Module {
         self
     }
 
+    /// Push a new trait
+    pub fn new_trait(&mut self, name: impl Into<String>) -> &mut Trait {
+        self.scope.new_trait(name)
+    }
+
     /// Push a trait definition
     pub fn push_trait(&mut self, item: Trait) -> &mut Self {
         self.scope.push_trait(item);
