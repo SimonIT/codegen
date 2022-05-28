@@ -89,7 +89,7 @@ impl Trait {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: &str) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl Into<String>) -> &mut Function {
         let mut func = Function::new(name);
         func.body = None;
 
