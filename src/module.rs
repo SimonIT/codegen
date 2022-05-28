@@ -24,6 +24,9 @@ pub struct Module {
 
     /// Contents of the module
     scope: Scope,
+
+    /// Module attributes, e.g., `#[allow(unused_imports)]`.
+    attributes: Vec<String>,
 }
 
 impl Module {
@@ -34,6 +37,7 @@ impl Module {
             vis: None,
             docs: None,
             scope: Scope::new(),
+            attributes: Vec::new(),
         }
     }
 
@@ -54,6 +58,12 @@ impl Module {
     /// module.
     pub fn import(&mut self, path: &str, ty: &str) -> &mut Self {
         self.scope.import(path, ty);
+        self
+    }
+
+    /// Add an attribute to the module.
+    pub fn attr(&mut self, attribute: impl Into<String>) -> &mut Self {
+        self.attributes.push(attribute.into());
         self
     }
 
@@ -164,6 +174,10 @@ impl Module {
 
     /// Formats the module using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        for attr in &self.attributes {
+            writeln!(fmt, "#[{}] ", attr)?;
+        }
+
         if let Some(ref vis) = self.vis {
             write!(fmt, "{} ", vis)?;
         }
