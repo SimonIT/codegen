@@ -98,8 +98,8 @@ impl Function {
     }
 
     /// Add a generic to the function.
-    pub fn generic(&mut self, name: &str) -> &mut Self {
-        self.generics.push(name.to_string());
+    pub fn generic(&mut self, name: impl Into<String>) -> &mut Self {
+        self.generics.push(name.into());
         self
     }
 
