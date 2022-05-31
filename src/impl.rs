@@ -86,6 +86,7 @@ impl Impl {
     {
         self.assoc_tys.push(Field {
             name: name.to_string(),
+            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),

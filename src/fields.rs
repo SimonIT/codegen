@@ -34,6 +34,7 @@ impl Fields {
     {
         self.push_named(Field {
             name: name.to_string(),
+            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
@@ -73,6 +74,9 @@ impl Fields {
                             for ann in &f.annotation {
                                 write!(fmt, "{}\n", ann)?;
                             }
+                        }
+                        if let Some(ref vis) = f.vis {
+                            write!(fmt, "{} ", vis)?;
                         }
                         write!(fmt, "{}: ", f.name)?;
                         f.ty.fmt(fmt)?;

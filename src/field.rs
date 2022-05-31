@@ -6,6 +6,9 @@ pub struct Field {
     /// Field name
     pub name: String,
 
+    /// The field's visibility
+    pub vis: Option<String>,
+
     /// Field type
     pub ty: Type,
 
@@ -24,10 +27,17 @@ impl Field {
     {
         Field {
             name: name.into(),
+            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
         }
+    }
+
+    /// Set the field's visibility
+    pub fn vis(&mut self, vis: impl Into<String>) -> &mut Self {
+        self.vis = Some(vis.into());
+        self
     }
 
     /// Set field's documentation.

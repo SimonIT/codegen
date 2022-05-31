@@ -134,6 +134,7 @@ impl Function {
             // Simply use empty strings.
             documentation: String::new(),
             annotation: Vec::new(),
+            vis: None,
         });
 
         self
