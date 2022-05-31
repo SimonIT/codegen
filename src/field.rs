@@ -10,7 +10,7 @@ pub struct Field {
     pub ty: Type,
 
     /// Field documentation
-    pub documentation: Vec<String>,
+    pub documentation: String,
 
     /// Field annotation
     pub annotation: Vec<String>,
@@ -25,20 +25,20 @@ impl Field {
         Field {
             name: name.into(),
             ty: ty.into(),
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
         }
     }
 
     /// Set field's documentation.
-    pub fn doc(&mut self, documentation: Vec<&str>) -> &mut Self {
-        self.documentation = documentation.iter().map(|doc| doc.to_string()).collect();
+    pub fn doc(&mut self, documentation: impl Into<String>) -> &mut Self {
+        self.documentation = documentation.into();
         self
     }
 
     /// Set field's annotation.
-    pub fn annotation(&mut self, annotation: Vec<&str>) -> &mut Self {
-        self.annotation = annotation.iter().map(|ann| ann.to_string()).collect();
+    pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
+        self.annotation.push(annotation.into());
         self
     }
 }

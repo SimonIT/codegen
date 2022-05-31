@@ -132,7 +132,7 @@ impl Function {
             // While a `Field` is used here, both `documentation`
             // and `annotation` does not make sense for function arguments.
             // Simply use empty strings.
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
         });
 
