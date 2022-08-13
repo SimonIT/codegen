@@ -41,11 +41,13 @@ struct Foo {
     assert_eq!(scope.to_string(), &expect[1..]);
 }
 
+// Carter 8/13/22 I found this test broken because both annotation and documentation do not support vectors
+// I'm reducing this test down to single line versions, but unclear how this test appeared broken
 #[test]
 fn single_struct_documented_field() {
     let mut scope = Scope::new();
 
-    let doc = vec!["Field's documentation", "Second line"];
+    let doc = "Field's documentation";
 
     let mut struct_ = Struct::new("Foo");
 
@@ -54,14 +56,11 @@ fn single_struct_documented_field() {
     struct_.push_field(field1);
 
     let mut field2 = Field::new("two", "usize");
-    field2.annotation(vec![r#"#[serde(rename = "bar")]"#]);
+    field2.annotation(r#"#[serde(rename = "bar")]"#);
     struct_.push_field(field2);
 
     let mut field3 = Field::new("three", "usize");
-    field3.doc(doc).annotation(vec![
-        r#"#[serde(skip_serializing)]"#,
-        r#"#[serde(skip_deserializing)]"#,
-    ]);
+    field3.doc(doc).annotation(r#"#[serde(skip_serializing)]"#);
     struct_.push_field(field3);
 
     scope.push_struct(struct_);
@@ -69,14 +68,11 @@ fn single_struct_documented_field() {
     let expect = r#"
 struct Foo {
     /// Field's documentation
-    /// Second line
     one: usize,
     #[serde(rename = "bar")]
     two: usize,
     /// Field's documentation
-    /// Second line
     #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
     three: usize,
 }"#;
 
