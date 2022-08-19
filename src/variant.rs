@@ -10,6 +10,7 @@ use crate::r#type::Type;
 pub struct Variant {
     name: String,
     fields: Fields,
+    /// Annotations for field e.g., `#[serde(rename = "variant")]`.
     annotations: Vec<String>,
 }
 
@@ -39,7 +40,7 @@ impl Variant {
     }
 
     /// Add an anotation to the variant.
-    pub fn annotation(&mut self, annotation: &str) -> &mut Self {
+    pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
         self.annotations.push(annotation.to_string());
         self
     }

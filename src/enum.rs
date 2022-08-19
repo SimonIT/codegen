@@ -15,7 +15,7 @@ pub struct Enum {
 
 impl Enum {
     /// Return a enum definition with the provided name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Enum {
             type_def: TypeDef::new(name),
             variants: vec![],
@@ -79,7 +79,7 @@ impl Enum {
     }
 
     /// Push a variant to the enum, returning a mutable reference to it.
-    pub fn new_variant(&mut self, name: &str) -> &mut Variant {
+    pub fn new_variant(&mut self, name: impl Into<String>) -> &mut Variant {
         self.push_variant(Variant::new(name));
         self.variants.last_mut().unwrap()
     }

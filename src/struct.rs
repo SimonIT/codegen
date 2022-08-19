@@ -63,6 +63,12 @@ impl Struct {
         self
     }
 
+    /// Add a new attribute to the struct
+    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
+        self.type_def.attr(attr);
+        self
+    }
+
     /// Specify lint attribute to supress a warning or error.
     pub fn allow(&mut self, allow: &str) -> &mut Self {
         self.type_def.allow(allow);

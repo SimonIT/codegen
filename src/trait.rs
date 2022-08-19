@@ -13,6 +13,7 @@ use crate::r#type::Type;
 pub struct Trait {
     type_def: TypeDef,
     parents: Vec<Type>,
+    attributes: Vec<String>,
     associated_tys: Vec<AssociatedType>,
     fns: Vec<Function>,
     macros: Vec<String>,
@@ -20,10 +21,11 @@ pub struct Trait {
 
 impl Trait {
     /// Return a trait definition with the provided name
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Trait {
             type_def: TypeDef::new(name),
             parents: vec![],
+            attributes: vec![],
             associated_tys: vec![],
             fns: vec![],
             macros: vec![],
@@ -38,6 +40,12 @@ impl Trait {
     /// Set the trait visibility.
     pub fn vis(&mut self, vis: &str) -> &mut Self {
         self.type_def.vis(vis);
+        self
+    }
+
+    /// Attr
+    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
+        self.attributes.push(attr.into());
         self
     }
 
@@ -89,7 +97,7 @@ impl Trait {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: &str) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl Into<String>) -> &mut Function {
         let mut func = Function::new(name);
         func.body = None;
 
@@ -105,6 +113,10 @@ impl Trait {
 
     /// Formats the scope using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        for attr in &self.attributes {
+            writeln!(fmt, "#[{}]", attr)?;
+        }
+
         self.type_def.fmt_head("trait", &self.parents, fmt)?;
 
         fmt.block(|fmt| {
