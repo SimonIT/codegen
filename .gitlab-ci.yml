@@ -8,6 +8,8 @@ image: "rust:latest"
 test:cargo:
   script:
     - rustc --version && cargo --version  # Print version info for debugging
+    # Install rustfmt see https://rustrepo.com/repo/rust-lang-docker-rust-rust-deployment #4 for why
+    - rustup component add rustfmt
     - cargo fmt --all -- --check # Enforce linting rules
     - cargo test --workspace --verbose # Build and test
 
