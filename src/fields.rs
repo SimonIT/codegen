@@ -42,11 +42,11 @@ impl Fields {
         })
     }
 
-    pub fn new_named<T>(&mut self, name: &str, ty: T) -> &mut Field
+    pub fn new_named<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
     where
         T: Into<Type>,
     {
-        self.named(name, ty);
+        self.named(&name.into(), ty);
         if let Fields::Named(ref mut fields) = *self {
             fields.last_mut().unwrap()
         } else {
@@ -88,7 +88,7 @@ impl Fields {
                                 write!(fmt, "{}\n", ann)?;
                             }
                         }
-                        if let Some(visibility) = &f.visibility {
+                        if let Some(ref visibility) = f.visibility {
                             write!(fmt, "{} ", visibility)?;
                         }
                         write!(fmt, "{}: ", f.name)?;

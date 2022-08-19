@@ -82,12 +82,12 @@ impl Trait {
 
     /// Add an associated const. Returns a mutable reference to the new
     /// associated const for futher configuration.
-    pub fn associated_const<T>(&mut self, name: &str, ty: T) -> &mut AssociatedConst
+    pub fn associated_const<T>(&mut self, name: impl Into<String>, ty: T) -> &mut AssociatedConst
     where
         T: Into<Type>,
     {
         self.associated_consts.push(AssociatedConst(Bound {
-            name: name.to_string(),
+            name: name.into(),
             bound: vec![ty.into()],
         }));
 

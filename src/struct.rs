@@ -100,7 +100,7 @@ impl Struct {
     ///
     /// A struct can either set named fields with this function or tuple fields
     /// with `tuple_field`, but not both.
-    pub fn new_field<T>(&mut self, name: &str, ty: T) -> &mut Field
+    pub fn new_field<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
     where
         T: Into<Type>,
     {

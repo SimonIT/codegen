@@ -51,8 +51,8 @@ impl Field {
     }
 
     /// Set the visibility of the field
-    pub fn vis(&mut self, visibility: &str) -> &mut Self {
-        self.visibility = Some(visibility.to_string());
+    pub fn vis(&mut self, visibility: impl Into<String>) -> &mut Self {
+        self.visibility = Some(visibility.into());
         self
     }
 }

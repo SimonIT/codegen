@@ -86,21 +86,21 @@ impl Impl {
     /// Set an associated constant.
     pub fn associate_const<T>(
         &mut self,
-        name: &str,
+        name: impl Into<String>,
         ty: T,
-        value: &str,
-        visibility: &str,
+        value: impl Into<String>,
+        visibility: impl Into<String>,
     ) -> &mut Self
     where
         T: Into<Type>,
     {
         self.assoc_csts.push(Field {
-            name: name.to_string(),
+            name: name.into(),
             ty: ty.into(),
             documentation: Vec::new(),
             annotation: Vec::new(),
-            value: value.to_string(),
-            visibility: Some(visibility.to_string()),
+            value: value.into(),
+            visibility: Some(visibility.into()),
         });
 
         self
