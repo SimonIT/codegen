@@ -8,15 +8,17 @@ pub struct Docs {
 }
 
 impl Docs {
-    pub fn new(docs: &str) -> Self {
-        Docs {
-            docs: docs.to_string(),
-        }
+    pub fn new(docs: impl Into<String>) -> Self {
+        Docs { docs: docs.into() }
     }
 
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
         for line in self.docs.lines() {
-            write!(fmt, "/// {}\n", line)?;
+            write!(fmt, "///")?;
+            if !line.is_empty() {
+                write!(fmt, " {}", line)?;
+            }
+            writeln!(fmt)?;
         }
 
         Ok(())

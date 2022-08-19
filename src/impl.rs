@@ -97,7 +97,7 @@ impl Impl {
         self.assoc_csts.push(Field {
             name: name.into(),
             ty: ty.into(),
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
             value: value.into(),
             visibility: Some(visibility.into()),
@@ -114,7 +114,7 @@ impl Impl {
         self.assoc_tys.push(Field {
             name: name.to_string(),
             ty: ty.into(),
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
             value: String::new(),
             visibility: None,

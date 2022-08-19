@@ -11,9 +11,9 @@ pub struct Type {
 
 impl Type {
     /// Return a new type with the given name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Type {
-            name: name.to_string(),
+            name: name.into(),
             generics: vec![],
         }
     }
@@ -74,24 +74,12 @@ impl Type {
     }
 }
 
-impl<'a> From<&'a str> for Type {
-    fn from(src: &'a str) -> Self {
-        Type::new(src)
-    }
-}
-
-impl From<String> for Type {
-    fn from(src: String) -> Self {
+impl<S: Into<String>> From<S> for Type {
+    fn from(src: S) -> Self {
         Type {
-            name: src,
+            name: src.into(),
             generics: vec![],
         }
-    }
-}
-
-impl<'a> From<&'a String> for Type {
-    fn from(src: &'a String) -> Self {
-        Type::new(src)
     }
 }
 

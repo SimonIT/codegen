@@ -35,7 +35,7 @@ impl Fields {
         self.push_named(Field {
             name: name.to_string(),
             ty: ty.into(),
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
             value: String::new(),
             visibility: None,
@@ -79,7 +79,7 @@ impl Fields {
                 fmt.block(|fmt| {
                     for f in fields {
                         if !f.documentation.is_empty() {
-                            for doc in &f.documentation {
+                            for doc in f.documentation.lines() {
                                 write!(fmt, "/// {}\n", doc)?;
                             }
                         }
