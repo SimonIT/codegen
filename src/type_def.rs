@@ -14,6 +14,7 @@ pub struct TypeDef {
     docs: Option<Docs>,
     derive: Vec<String>,
     allow: Vec<String>,
+    attributes: Vec<String>,
     repr: Option<String>,
     bounds: Vec<Bound>,
     macros: Vec<String>,
@@ -21,13 +22,14 @@ pub struct TypeDef {
 
 impl TypeDef {
     /// Return a structure definition with the provided name
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         TypeDef {
             ty: Type::new(name),
             vis: None,
             docs: None,
             derive: vec![],
             allow: vec![],
+            attributes: vec![],
             repr: None,
             bounds: vec![],
             macros: vec![],
@@ -50,6 +52,10 @@ impl TypeDef {
 
     pub fn r#macro(&mut self, r#macro: &str) {
         self.macros.push(r#macro.to_string());
+    }
+
+    pub fn attr(&mut self, attr: impl Into<String>) {
+        self.attributes.push(attr.into());
     }
 
     pub fn doc(&mut self, docs: &str) {
@@ -81,6 +87,7 @@ impl TypeDef {
         self.fmt_allow(fmt)?;
         self.fmt_derive(fmt)?;
         self.fmt_repr(fmt)?;
+        self.fmt_attributes(fmt)?;
         self.fmt_macros(fmt)?;
 
         if let Some(ref vis) = self.vis {
@@ -103,6 +110,14 @@ impl TypeDef {
         }
 
         fmt_bounds(&self.bounds, fmt)?;
+
+        Ok(())
+    }
+
+    fn fmt_attributes(&self, fmt: &mut Formatter) -> fmt::Result {
+        for attr in &self.attributes {
+            write!(fmt, "#[{}]\n", attr)?;
+        }
 
         Ok(())
     }

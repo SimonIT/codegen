@@ -165,7 +165,7 @@ impl Scope {
     }
 
     /// Push a new trait definition, returning a mutable reference to it.
-    pub fn new_trait(&mut self, name: &str) -> &mut Trait {
+    pub fn new_trait(&mut self, name: impl Into<String>) -> &mut Trait {
         self.push_trait(Trait::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -181,7 +181,7 @@ impl Scope {
     }
 
     /// Push a new struct definition, returning a mutable reference to it.
-    pub fn new_enum(&mut self, name: &str) -> &mut Enum {
+    pub fn new_enum(&mut self, name: impl Into<String>) -> &mut Enum {
         self.push_enum(Enum::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -215,8 +215,8 @@ impl Scope {
     /// Push a raw string to the scope.
     ///
     /// This string will be included verbatim in the formatted string.
-    pub fn raw(&mut self, val: &str) -> &mut Self {
-        self.items.push(Item::Raw(val.to_string()));
+    pub fn raw(&mut self, val: impl Into<String>) -> &mut Self {
+        self.items.push(Item::Raw(val.into()));
         self
     }
 

@@ -55,9 +55,9 @@ pub struct Function {
 
 impl Function {
     /// Return a new function definition.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Function {
-            name: name.to_string(),
+            name: name.into(),
             docs: None,
             allow: None,
             vis: None,
@@ -74,7 +74,7 @@ impl Function {
     }
 
     /// Set the function documentation.
-    pub fn doc(&mut self, docs: &str) -> &mut Self {
+    pub fn doc(&mut self, docs: impl Into<String>) -> &mut Self {
         self.docs = Some(Docs::new(docs));
         self
     }
@@ -98,8 +98,8 @@ impl Function {
     }
 
     /// Add a generic to the function.
-    pub fn generic(&mut self, name: &str) -> &mut Self {
-        self.generics.push(name.to_string());
+    pub fn generic(&mut self, name: impl Into<String>) -> &mut Self {
+        self.generics.push(name.into());
         self
     }
 
@@ -132,8 +132,9 @@ impl Function {
             // While a `Field` is used here, both `documentation`
             // and `annotation` does not make sense for function arguments.
             // Simply use empty strings.
-            documentation: Vec::new(),
+            documentation: String::new(),
             annotation: Vec::new(),
+            vis: None,
         });
 
         self
