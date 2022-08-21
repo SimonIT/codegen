@@ -1,5 +1,6 @@
 use std::fmt::{self, Write};
 
+use crate::associated_const::AssociatedConst;
 use crate::associated_type::AssociatedType;
 use crate::bound::Bound;
 use crate::formatter::{fmt_bound_rhs, Formatter};
@@ -13,6 +14,7 @@ use crate::r#type::Type;
 pub struct Trait {
     type_def: TypeDef,
     parents: Vec<Type>,
+    associated_consts: Vec<AssociatedConst>,
     attributes: Vec<String>,
     associated_tys: Vec<AssociatedType>,
     fns: Vec<Function>,
@@ -25,6 +27,7 @@ impl Trait {
         Trait {
             type_def: TypeDef::new(name),
             parents: vec![],
+            associated_consts: vec![],
             attributes: vec![],
             associated_tys: vec![],
             fns: vec![],
@@ -85,6 +88,20 @@ impl Trait {
         self
     }
 
+    /// Add an associated const. Returns a mutable reference to the new
+    /// associated const for futher configuration.
+    pub fn associated_const<T>(&mut self, name: impl Into<String>, ty: T) -> &mut AssociatedConst
+    where
+        T: Into<Type>,
+    {
+        self.associated_consts.push(AssociatedConst(Bound {
+            name: name.into(),
+            bound: vec![ty.into()],
+        }));
+
+        self.associated_consts.last_mut().unwrap()
+    }
+
     /// Add an associated type. Returns a mutable reference to the new
     /// associated type for futher configuration.
     pub fn associated_type(&mut self, name: &str) -> &mut AssociatedType {
@@ -120,11 +137,28 @@ impl Trait {
         self.type_def.fmt_head("trait", &self.parents, fmt)?;
 
         fmt.block(|fmt| {
-            let assoc = &self.associated_tys;
+            let assoc_csts = &self.associated_consts;
+            let assoc_tys = &self.associated_tys;
 
             // format associated types
-            if !assoc.is_empty() {
-                for ty in assoc {
+            if !assoc_csts.is_empty() {
+                for cst in assoc_csts {
+                    let cst = &cst.0;
+
+                    write!(fmt, "const {}", cst.name)?;
+
+                    if !cst.bound.is_empty() {
+                        write!(fmt, ": ")?;
+                        fmt_bound_rhs(&cst.bound, fmt)?;
+                    }
+
+                    write!(fmt, ";\n")?;
+                }
+            }
+
+            // format associated types
+            if !assoc_tys.is_empty() {
+                for ty in assoc_tys {
                     let ty = &ty.0;
 
                     write!(fmt, "type {}", ty.name)?;
@@ -139,7 +173,7 @@ impl Trait {
             }
 
             for (i, func) in self.fns.iter().enumerate() {
-                if i != 0 || !assoc.is_empty() {
+                if i != 0 || !assoc_tys.is_empty() || !assoc_csts.is_empty() {
                     write!(fmt, "\n")?;
                 }
 
