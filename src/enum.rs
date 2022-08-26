@@ -72,9 +72,15 @@ impl Enum {
         self
     }
 
+    /// Add an arbitrary macro.
+    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+        self.type_def.r#macro(r#macro);
+        self
+    }
+
     /// Push a variant to the enum, returning a mutable reference to it.
     pub fn new_variant(&mut self, name: impl Into<String>) -> &mut Variant {
-        self.push_variant(Variant::new(name));
+        self.push_variant(Variant::new(name.into()));
         self.variants.last_mut().unwrap()
     }
 
