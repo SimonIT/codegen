@@ -41,11 +41,13 @@ struct Foo {
     assert_eq!(scope.to_string(), &expect[1..]);
 }
 
+// Carter 8/13/22 I found this test broken because both annotation and documentation do not support vectors
+// I'm reducing this test down to single line versions, but unclear how this test appeared broken
 #[test]
 fn single_struct_documented_field() {
     let mut scope = Scope::new();
 
-    let doc = vec!["Field's documentation", "Second line"];
+    let doc = "Field's documentation\nSecond line";
 
     let mut struct_ = Struct::new("Foo");
 
@@ -54,14 +56,13 @@ fn single_struct_documented_field() {
     struct_.push_field(field1);
 
     let mut field2 = Field::new("two", "usize");
-    field2.annotation(vec![r#"#[serde(rename = "bar")]"#]);
+    field2.annotation("#[serde(rename = \"bar\")]");
     struct_.push_field(field2);
 
     let mut field3 = Field::new("three", "usize");
-    field3.doc(doc).annotation(vec![
-        r#"#[serde(skip_serializing)]"#,
-        r#"#[serde(skip_deserializing)]"#,
-    ]);
+    field3
+        .doc(doc)
+        .annotation("#[serde(skip_serializing)]\n#[serde(skip_deserializing)]");
     struct_.push_field(field3);
 
     scope.push_struct(struct_);
@@ -601,6 +602,54 @@ fn enum_with_multiple_allow() {
 enum IpAddrKind {
     V4,
     V6,
+}"#;
+
+    assert_eq!(scope.to_string(), &expect[1..]);
+}
+
+#[test]
+fn impl_with_associated_const() {
+    let mut scope = Scope::new();
+
+    let mut bar = scope.new_trait("Bar");
+    bar.associated_const("CONST_NAME", Type::new("f32"));
+
+    let mut foo = scope.new_struct("Foo");
+
+    let mut foo_impl = scope.new_impl("Foo");
+    foo_impl.impl_trait("Bar");
+    foo_impl.associate_const("CONST_NAME", Type::new("f32"), "0.0", "pub");
+
+    let expect = r#"
+trait Bar {
+    const CONST_NAME: f32;
+}
+
+struct Foo;
+
+impl Bar for Foo {
+    pub const CONST_NAME: f32 = 0.0;
+}"#;
+
+    assert_eq!(scope.to_string(), &expect[1..]);
+}
+
+#[test]
+fn struct_with_member_visibility() {
+    let mut scope = Scope::new();
+
+    let struct_description = scope.new_struct("Foo");
+
+    let mut bar = Field::new("bar", "usize");
+    bar.vis("pub");
+
+    struct_description.push_field(bar);
+    struct_description.new_field("baz", "i16").vis("pub(crate)");
+
+    let expect = r#"
+struct Foo {
+    pub bar: usize,
+    pub(crate) baz: i16,
 }"#;
 
     assert_eq!(scope.to_string(), &expect[1..]);
