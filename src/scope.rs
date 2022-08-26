@@ -221,7 +221,11 @@ impl Scope {
     }
 
     /// Push a new `TypeAlias`, returning a mutable reference to it.
-    pub fn new_type_alias(&mut self, name: impl Into<String>, target: impl Into<String>) -> &mut TypeAlias {
+    pub fn new_type_alias(
+        &mut self,
+        name: impl Into<String>,
+        target: impl Into<String>,
+    ) -> &mut TypeAlias {
         self.push_type_alias(TypeAlias::new(name.into(), target.into()));
 
         match *self.items.last_mut().unwrap() {

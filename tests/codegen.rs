@@ -28,14 +28,12 @@ struct Foo {
 fn type_alias() {
     let mut scope = Scope::new();
 
-    scope
-        .new_type_alias("hello", "world").vis("pub");
+    scope.new_type_alias("hello", "world").vis("pub");
 
     let expect = r#"pub type hello = world;"#;
 
     assert_eq!(scope.to_string(), expect);
 }
-
 
 #[test]
 fn struct_with_pushed_field() {
