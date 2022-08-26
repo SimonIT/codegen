@@ -5,7 +5,7 @@ use crate::r#enum::Enum;
 use crate::r#impl::Impl;
 use crate::r#struct::Struct;
 use crate::r#trait::Trait;
-use crate::type_alias::TypeAlias;
+use crate::r#type_alias::TypeAlias;
 
 #[derive(Debug, Clone)]
 pub enum Item {
