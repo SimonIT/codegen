@@ -19,6 +19,9 @@ pub struct Impl {
     /// If implementing a trait
     impl_trait: Option<Type>,
 
+    /// Associated constants
+    assoc_csts: Vec<Field>,
+
     /// Associated types
     assoc_tys: Vec<Field>,
 
@@ -40,6 +43,7 @@ impl Impl {
             target: target.into(),
             generics: vec![],
             impl_trait: None,
+            assoc_csts: vec![],
             assoc_tys: vec![],
             bounds: vec![],
             fns: vec![],
@@ -79,6 +83,29 @@ impl Impl {
         self
     }
 
+    /// Set an associated constant.
+    pub fn associate_const<T>(
+        &mut self,
+        name: impl Into<String>,
+        ty: T,
+        value: impl Into<String>,
+        visibility: impl Into<String>,
+    ) -> &mut Self
+    where
+        T: Into<Type>,
+    {
+        self.assoc_csts.push(Field {
+            name: name.into(),
+            ty: ty.into(),
+            documentation: String::new(),
+            annotation: Vec::new(),
+            value: value.into(),
+            visibility: Some(visibility.into()),
+        });
+
+        self
+    }
+
     /// Set an associated type.
     pub fn associate_type<T>(&mut self, name: &str, ty: T) -> &mut Self
     where
@@ -86,10 +113,11 @@ impl Impl {
     {
         self.assoc_tys.push(Field {
             name: name.to_string(),
-            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
+            value: String::new(),
+            visibility: None,
         });
 
         self
@@ -139,6 +167,18 @@ impl Impl {
         fmt_bounds(&self.bounds, fmt)?;
 
         fmt.block(|fmt| {
+            // format associated constants
+            if !self.assoc_csts.is_empty() {
+                for cst in &self.assoc_csts {
+                    if let Some(vis) = &cst.visibility {
+                        write!(fmt, "{} ", vis)?;
+                    }
+                    write!(fmt, "const {}: ", cst.name)?;
+                    cst.ty.fmt(fmt)?;
+                    write!(fmt, " = {};\n", cst.value)?;
+                }
+            }
+
             // format associated types
             if !self.assoc_tys.is_empty() {
                 for ty in &self.assoc_tys {
