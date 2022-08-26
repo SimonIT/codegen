@@ -31,10 +31,9 @@ fn type_alias() {
     scope
         .new_type_alias("hello", "world").vis("pub");
 
-    let expect = r#"
-pub type hello = world;"#;
+    let expect = r#"pub type hello = world;"#;
 
-    assert_eq!(scope.to_string(), &expect[1..]);
+    assert_eq!(scope.to_string(), expect);
 }
 
 
