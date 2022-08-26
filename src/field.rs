@@ -6,9 +6,6 @@ pub struct Field {
     /// Field name
     pub name: String,
 
-    /// The field's visibility
-    pub vis: Option<String>,
-
     /// Field type
     pub ty: Type,
 
@@ -17,6 +14,12 @@ pub struct Field {
 
     /// Field annotation
     pub annotation: Vec<String>,
+
+    /// Field value
+    pub value: String,
+
+    /// The visibility of the field
+    pub visibility: Option<String>,
 }
 
 impl Field {
@@ -27,17 +30,12 @@ impl Field {
     {
         Field {
             name: name.into(),
-            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
+            value: String::new(),
+            visibility: None,
         }
-    }
-
-    /// Set the field's visibility
-    pub fn vis(&mut self, vis: impl Into<String>) -> &mut Self {
-        self.vis = Some(vis.into());
-        self
     }
 
     /// Set field's documentation.
@@ -49,6 +47,12 @@ impl Field {
     /// Set field's annotation.
     pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
         self.annotation.push(annotation.into());
+        self
+    }
+
+    /// Set the visibility of the field
+    pub fn vis(&mut self, visibility: impl Into<String>) -> &mut Self {
+        self.visibility = Some(visibility.into());
         self
     }
 }

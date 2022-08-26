@@ -34,11 +34,24 @@ impl Fields {
     {
         self.push_named(Field {
             name: name.to_string(),
-            vis: None,
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
+            value: String::new(),
+            visibility: None,
         })
+    }
+
+    pub fn new_named<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
+    where
+        T: Into<Type>,
+    {
+        self.named(&name.into(), ty);
+        if let Fields::Named(ref mut fields) = *self {
+            fields.last_mut().unwrap()
+        } else {
+            unreachable!()
+        }
     }
 
     pub fn tuple<T>(&mut self, ty: T) -> &mut Self
@@ -75,8 +88,8 @@ impl Fields {
                                 write!(fmt, "{}\n", ann)?;
                             }
                         }
-                        if let Some(ref vis) = f.vis {
-                            write!(fmt, "{} ", vis)?;
+                        if let Some(ref visibility) = f.visibility {
+                            write!(fmt, "{} ", visibility)?;
                         }
                         write!(fmt, "{}: ", f.name)?;
                         f.ty.fmt(fmt)?;

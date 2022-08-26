@@ -9,11 +9,9 @@ use crate::r#type::Type;
 #[derive(Debug, Clone)]
 pub struct Variant {
     name: String,
-
     fields: Fields,
-
-    /// Variant attributes, e.g., `#[serde(rename = "variant")]`.
-    attributes: Vec<String>,
+    /// Annotations for field e.g., `#[serde(rename = "variant")]`.
+    annotations: Vec<String>,
 }
 
 impl Variant {
@@ -22,7 +20,7 @@ impl Variant {
         Variant {
             name: name.into(),
             fields: Fields::Empty,
-            attributes: Vec::new(),
+            annotations: Vec::new(),
         }
     }
 
@@ -36,21 +34,22 @@ impl Variant {
     }
 
     /// Add a tuple field to the variant.
-    pub fn tuple(&mut self, ty: impl Into<String>) -> &mut Self {
+    pub fn tuple(&mut self, ty: &str) -> &mut Self {
         self.fields.tuple(ty);
         self
     }
 
-    /// Add an attribute to the variant.
-    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
-        self.attributes.push(attr.into());
+    /// Add an anotation to the variant.
+    pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
+        self.annotations.push(annotation.into());
         self
     }
 
     /// Formats the variant using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
-        for attr in &self.attributes {
-            write!(fmt, "#[{}]\n", attr)?;
+        for a in &self.annotations {
+            write!(fmt, "{}", a)?;
+            write!(fmt, "\n")?;
         }
         write!(fmt, "{}", self.name)?;
         self.fields.fmt(fmt)?;

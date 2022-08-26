@@ -81,6 +81,12 @@ impl Struct {
         self
     }
 
+    /// Add an arbitrary macro.
+    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+        self.type_def.r#macro(r#macro);
+        self
+    }
+
     /// Push a named field to the struct.
     ///
     /// A struct can either set named fields with this function or tuple fields
@@ -100,6 +106,17 @@ impl Struct {
     {
         self.fields.named(name, ty);
         self
+    }
+
+    /// Create a named field for the struct.
+    ///
+    /// A struct can either set named fields with this function or tuple fields
+    /// with `tuple_field`, but not both.
+    pub fn new_field<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
+    where
+        T: Into<Type>,
+    {
+        self.fields.new_named(name, ty)
     }
 
     /// Add a tuple field to the struct.
