@@ -80,7 +80,7 @@ impl Enum {
 
     /// Push a variant to the enum, returning a mutable reference to it.
     pub fn new_variant(&mut self, name: impl Into<String>) -> &mut Variant {
-        self.push_variant(Variant::new(name));
+        self.push_variant(Variant::new(name.into()));
         self.variants.last_mut().unwrap()
     }
 

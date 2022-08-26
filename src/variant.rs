@@ -16,9 +16,9 @@ pub struct Variant {
 
 impl Variant {
     /// Return a new enum variant with the given name.
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl Into<String>) -> Self {
         Variant {
-            name: name.to_string(),
+            name: name.into(),
             fields: Fields::Empty,
             annotations: Vec::new(),
         }
@@ -41,7 +41,7 @@ impl Variant {
 
     /// Add an anotation to the variant.
     pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
-        self.annotations.push(annotation.to_string());
+        self.annotations.push(annotation.into());
         self
     }
 
