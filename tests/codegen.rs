@@ -621,12 +621,12 @@ enum IpAddrKind {
 fn impl_with_associated_const() {
     let mut scope = Scope::new();
 
-    let mut bar = scope.new_trait("Bar");
+    let bar = scope.new_trait("Bar");
     bar.associated_const("CONST_NAME", Type::new("f32"));
 
-    let mut foo = scope.new_struct("Foo");
+    let _foo = scope.new_struct("Foo");
 
-    let mut foo_impl = scope.new_impl("Foo");
+    let foo_impl = scope.new_impl("Foo");
     foo_impl.impl_trait("Bar");
     foo_impl.associate_const("CONST_NAME", Type::new("f32"), "0.0", "pub");
 

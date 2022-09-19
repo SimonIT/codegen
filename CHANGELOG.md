@@ -1,10 +1,19 @@
 # <future version>
 
 ### Added
-- Add support for associated constants
 
 ### Changed
-- updated the crate to rust 2018 edition
+
+# 0.2.0 (August 26, 2022)
+
+### Added
+- Add support for associated constants
+- Add support for type alias
+- Add annotations for structs, enums, and variants
+
+### Changed
+- Most APIs updated to take `impl Into<String>` uniformly
+- Updated the crate to rust 2021 edition
 
 # 0.1.3 (May 9, 2020)
 

@@ -2,11 +2,9 @@
 
 Provides an builder API to assist in generating Rust code.
 
-[![Build Status](https://travis-ci.org/carllerche/codegen.svg?branch=master)](https://travis-ci.org/carllerche/codegen)
-
 More information about this crate can be found in the [crate documentation][dox]
 
-[dox]: https://docs.rs/codegen/0.1.3/codegen/
+[dox]: https://docs.rs/codegen/0.2.0/codegen/
 
 ## Installation
 
@@ -14,7 +12,7 @@ To use `codegen`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-codegen = "0.1.3"
+codegen = "0.2.0"
 ```
 
 Next, add this to your crate:
