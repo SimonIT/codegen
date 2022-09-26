@@ -18,7 +18,7 @@ pub struct Struct {
 
 impl Struct {
     /// Return a structure definition with the provided name
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Struct {
             type_def: TypeDef::new(name),
             fields: Fields::Empty,
@@ -31,19 +31,19 @@ impl Struct {
     }
 
     /// Set the structure visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.type_def.vis(vis);
         self
     }
 
     /// Add a generic to the struct.
-    pub fn generic(&mut self, name: &str) -> &mut Self {
+    pub fn generic(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.ty.generic(name);
         self
     }
 
     /// Add a `where` bound to the struct.
-    pub fn bound<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -52,37 +52,37 @@ impl Struct {
     }
 
     /// Set the structure documentation.
-    pub fn doc(&mut self, docs: &str) -> &mut Self {
+    pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.type_def.doc(docs);
         self
     }
 
     /// Add a new type that the struct should derive.
-    pub fn derive(&mut self, name: &str) -> &mut Self {
+    pub fn derive(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.derive(name);
         self
     }
 
     /// Add a new attribute to the struct
-    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
+    pub fn attr(&mut self, attr: impl ToString) -> &mut Self {
         self.type_def.attr(attr);
         self
     }
 
     /// Specify lint attribute to supress a warning or error.
-    pub fn allow(&mut self, allow: &str) -> &mut Self {
+    pub fn allow(&mut self, allow: impl ToString) -> &mut Self {
         self.type_def.allow(allow);
         self
     }
 
     /// Specify representation.
-    pub fn repr(&mut self, repr: &str) -> &mut Self {
+    pub fn repr(&mut self, repr: impl ToString) -> &mut Self {
         self.type_def.repr(repr);
         self
     }
 
     /// Add an arbitrary macro.
-    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+    pub fn r#macro(&mut self, r#macro: impl ToString) -> &mut Self {
         self.type_def.r#macro(r#macro);
         self
     }
@@ -100,7 +100,7 @@ impl Struct {
     ///
     /// A struct can either set named fields with this function or tuple fields
     /// with `tuple_field`, but not both.
-    pub fn field<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn field<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -112,7 +112,7 @@ impl Struct {
     ///
     /// A struct can either set named fields with this function or tuple fields
     /// with `tuple_field`, but not both.
-    pub fn new_field<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
+    pub fn new_field<T>(&mut self, name: impl ToString, ty: T) -> &mut Field
     where
         T: Into<Type>,
     {

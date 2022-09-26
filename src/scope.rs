@@ -44,10 +44,11 @@ impl Scope {
     ///
     /// This results in a new `use` statement being added to the beginning of
     /// the scope.
-    pub fn import(&mut self, path: &str, ty: &str) -> &mut Import {
+    pub fn import(&mut self, path: impl ToString, ty: impl ToString) -> &mut Import {
         // handle cases where the caller wants to refer to a type namespaced
         // within the containing namespace, like "a::B".
-        let ty = ty.split("::").next().unwrap_or(ty);
+        let ty = ty.to_string();
+        let ty = ty.split("::").next().unwrap_or_else(|| ty.as_str());
         self.imports
             .entry(path.to_string())
             .or_insert(IndexMap::new())
@@ -67,7 +68,7 @@ impl Scope {
     /// will return the existing definition instead.
     ///
     /// [`get_or_new_module`]: #method.get_or_new_module
-    pub fn new_module(&mut self, name: &str) -> &mut Module {
+    pub fn new_module(&mut self, name: impl ToString) -> &mut Module {
         self.push_module(Module::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -77,38 +78,34 @@ impl Scope {
     }
 
     /// Returns a mutable reference to a module if it is exists in this scope.
-    pub fn get_module_mut<Q: ?Sized>(&mut self, name: &Q) -> Option<&mut Module>
-    where
-        String: PartialEq<Q>,
+    pub fn get_module_mut(&mut self, name: impl ToString) -> Option<&mut Module>
     {
+        let name = name.to_string();
         self.items
             .iter_mut()
-            .filter_map(|item| match item {
-                &mut Item::Module(ref mut module) if module.name == *name => Some(module),
+            .find_map(|item| match item {
+                &mut Item::Module(ref mut module) if module.name == name => Some(module),
                 _ => None,
             })
-            .next()
     }
 
     /// Returns a mutable reference to a module if it is exists in this scope.
-    pub fn get_module<Q: ?Sized>(&self, name: &Q) -> Option<&Module>
-    where
-        String: PartialEq<Q>,
+    pub fn get_module(&self, name: impl ToString) -> Option<&Module>
     {
+        let name = name.to_string();
         self.items
             .iter()
-            .filter_map(|item| match item {
-                &Item::Module(ref module) if module.name == *name => Some(module),
+            .find_map(|item| match item {
+                &Item::Module(ref module) if module.name == name => Some(module),
                 _ => None,
             })
-            .next()
     }
 
     /// Returns a mutable reference to a module, creating it if it does
     /// not exist.
-    pub fn get_or_new_module(&mut self, name: &str) -> &mut Module {
-        if self.get_module(name).is_some() {
-            self.get_module_mut(name).unwrap()
+    pub fn get_or_new_module(&mut self, name: impl ToString) -> &mut Module {
+        if self.get_module(name.to_string()).is_some() {
+            self.get_module_mut(name.to_string()).unwrap()
         } else {
             self.new_module(name)
         }
@@ -133,7 +130,7 @@ impl Scope {
     }
 
     /// Push a new struct definition, returning a mutable reference to it.
-    pub fn new_struct(&mut self, name: &str) -> &mut Struct {
+    pub fn new_struct(&mut self, name: impl ToString) -> &mut Struct {
         self.push_struct(Struct::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -149,7 +146,7 @@ impl Scope {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: &str) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl ToString) -> &mut Function {
         self.push_fn(Function::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -165,7 +162,7 @@ impl Scope {
     }
 
     /// Push a new trait definition, returning a mutable reference to it.
-    pub fn new_trait(&mut self, name: impl Into<String>) -> &mut Trait {
+    pub fn new_trait(&mut self, name: impl ToString) -> &mut Trait {
         self.push_trait(Trait::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -181,7 +178,7 @@ impl Scope {
     }
 
     /// Push a new struct definition, returning a mutable reference to it.
-    pub fn new_enum(&mut self, name: impl Into<String>) -> &mut Enum {
+    pub fn new_enum(&mut self, name: impl ToString) -> &mut Enum {
         self.push_enum(Enum::new(name));
 
         match *self.items.last_mut().unwrap() {
@@ -197,7 +194,7 @@ impl Scope {
     }
 
     /// Push a new `impl` block, returning a mutable reference to it.
-    pub fn new_impl(&mut self, target: &str) -> &mut Impl {
+    pub fn new_impl(&mut self, target: impl ToString) -> &mut Impl {
         self.push_impl(Impl::new(target));
 
         match *self.items.last_mut().unwrap() {
@@ -215,18 +212,18 @@ impl Scope {
     /// Push a raw string to the scope.
     ///
     /// This string will be included verbatim in the formatted string.
-    pub fn raw(&mut self, val: impl Into<String>) -> &mut Self {
-        self.items.push(Item::Raw(val.into()));
+    pub fn raw(&mut self, val: impl ToString) -> &mut Self {
+        self.items.push(Item::Raw(val.to_string()));
         self
     }
 
     /// Push a new `TypeAlias`, returning a mutable reference to it.
     pub fn new_type_alias(
         &mut self,
-        name: impl Into<String>,
-        target: impl Into<String>,
+        name: impl ToString,
+        target: impl ToString,
     ) -> &mut TypeAlias {
-        self.push_type_alias(TypeAlias::new(name.into(), target.into()));
+        self.push_type_alias(TypeAlias::new(name, target));
 
         match *self.items.last_mut().unwrap() {
             Item::TypeAlias(ref mut v) => v,

@@ -9,15 +9,15 @@ pub struct Import {
 
 impl Import {
     /// Return a new import.
-    pub fn new(path: &str, ty: &str) -> Self {
+    pub fn new(path: impl ToString, ty: impl ToString) -> Self {
         Import {
-            line: format!("{}::{}", path, ty),
+            line: format!("{}::{}", path.to_string(), ty.to_string()),
             vis: None,
         }
     }
 
     /// Set the import visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.vis = Some(vis.to_string());
         self
     }

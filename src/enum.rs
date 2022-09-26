@@ -15,7 +15,7 @@ pub struct Enum {
 
 impl Enum {
     /// Return a enum definition with the provided name.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Enum {
             type_def: TypeDef::new(name),
             variants: vec![],
@@ -28,19 +28,19 @@ impl Enum {
     }
 
     /// Set the enum visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.type_def.vis(vis);
         self
     }
 
     /// Add a generic to the enum.
-    pub fn generic(&mut self, name: &str) -> &mut Self {
+    pub fn generic(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.ty.generic(name);
         self
     }
 
     /// Add a `where` bound to the enum.
-    pub fn bound<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -49,38 +49,38 @@ impl Enum {
     }
 
     /// Set the enum documentation.
-    pub fn doc(&mut self, docs: &str) -> &mut Self {
+    pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.type_def.doc(docs);
         self
     }
 
     /// Add a new type that the struct should derive.
-    pub fn derive(&mut self, name: &str) -> &mut Self {
+    pub fn derive(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.derive(name);
         self
     }
 
     /// Specify lint attribute to supress a warning or error.
-    pub fn allow(&mut self, allow: &str) -> &mut Self {
+    pub fn allow(&mut self, allow: impl ToString) -> &mut Self {
         self.type_def.allow(allow);
         self
     }
 
     /// Specify representation.
-    pub fn repr(&mut self, repr: &str) -> &mut Self {
+    pub fn repr(&mut self, repr: impl ToString) -> &mut Self {
         self.type_def.repr(repr);
         self
     }
 
     /// Add an arbitrary macro.
-    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+    pub fn r#macro(&mut self, r#macro: impl ToString) -> &mut Self {
         self.type_def.r#macro(r#macro);
         self
     }
 
     /// Push a variant to the enum, returning a mutable reference to it.
-    pub fn new_variant(&mut self, name: impl Into<String>) -> &mut Variant {
-        self.push_variant(Variant::new(name.into()));
+    pub fn new_variant(&mut self, name: impl ToString) -> &mut Variant {
+        self.push_variant(Variant::new(name.to_string()));
         self.variants.last_mut().unwrap()
     }
 

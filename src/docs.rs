@@ -8,8 +8,8 @@ pub struct Docs {
 }
 
 impl Docs {
-    pub fn new(docs: impl Into<String>) -> Self {
-        Docs { docs: docs.into() }
+    pub fn new(docs: impl ToString) -> Self {
+        Docs { docs: docs.to_string() }
     }
 
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {

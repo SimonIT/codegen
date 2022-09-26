@@ -16,16 +16,16 @@ pub struct Variant {
 
 impl Variant {
     /// Return a new enum variant with the given name.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Variant {
-            name: name.into(),
+            name: name.to_string(),
             fields: Fields::Empty,
             annotations: Vec::new(),
         }
     }
 
     /// Add a named field to the variant.
-    pub fn named<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn named<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -34,7 +34,7 @@ impl Variant {
     }
 
     /// Add a tuple field to the variant.
-    pub fn tuple(&mut self, ty: &str) -> &mut Self {
+    pub fn tuple(&mut self, ty: impl ToString) -> &mut Self {
         self.fields.tuple(ty);
         self
     }

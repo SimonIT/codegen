@@ -13,7 +13,7 @@ pub struct Block {
 
 impl Block {
     /// Returns an empty code block.
-    pub fn new(before: &str) -> Self {
+    pub fn new(before: impl ToString) -> Self {
         Block {
             before: Some(before.to_string()),
             after: None,
@@ -37,7 +37,7 @@ impl Block {
     }
 
     /// Add a snippet after the block.
-    pub fn after(&mut self, after: &str) -> &mut Self {
+    pub fn after(&mut self, after: impl ToString) -> &mut Self {
         self.after = Some(after.to_string());
         self
     }

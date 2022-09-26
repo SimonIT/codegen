@@ -22,61 +22,61 @@ pub struct TypeDef {
 
 impl TypeDef {
     /// Return a structure definition with the provided name
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         TypeDef {
             ty: Type::new(name),
             vis: None,
             docs: None,
-            derive: vec![],
-            allow: vec![],
-            attributes: vec![],
+            derive: Vec::new(),
+            allow: Vec::new(),
+            attributes: Vec::new(),
             repr: None,
-            bounds: vec![],
-            macros: vec![],
+            bounds: Vec::new(),
+            macros: Vec::new(),
         }
     }
 
-    pub fn vis(&mut self, vis: impl Into<String>) {
-        self.vis = Some(vis.into());
+    pub fn vis(&mut self, vis: impl ToString) {
+        self.vis = Some(vis.to_string());
     }
 
-    pub fn bound<T>(&mut self, name: impl Into<String>, ty: T)
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T)
     where
         T: Into<Type>,
     {
         self.bounds.push(Bound {
-            name: name.into(),
+            name: name.to_string(),
             bound: vec![ty.into()],
         });
     }
 
-    pub fn r#macro(&mut self, r#macro: impl Into<String>) {
-        self.macros.push(r#macro.into());
+    pub fn r#macro(&mut self, r#macro: impl ToString) {
+        self.macros.push(r#macro.to_string());
     }
 
-    pub fn attr(&mut self, attr: impl Into<String>) {
-        self.attributes.push(attr.into());
+    pub fn attr(&mut self, attr: impl ToString) {
+        self.attributes.push(attr.to_string());
     }
 
-    pub fn doc(&mut self, docs: impl Into<String>) {
-        self.docs = Some(Docs::new(docs.into()));
+    pub fn doc(&mut self, docs: impl ToString) {
+        self.docs = Some(Docs::new(docs));
     }
 
-    pub fn derive(&mut self, name: impl Into<String>) {
-        self.derive.push(name.into());
+    pub fn derive(&mut self, name: impl ToString) {
+        self.derive.push(name.to_string());
     }
 
-    pub fn allow(&mut self, allow: impl Into<String>) {
-        self.allow.push(allow.into());
+    pub fn allow(&mut self, allow: impl ToString) {
+        self.allow.push(allow.to_string());
     }
 
-    pub fn repr(&mut self, repr: impl Into<String>) {
-        self.repr = Some(repr.into());
+    pub fn repr(&mut self, repr: impl ToString) {
+        self.repr = Some(repr.to_string());
     }
 
     pub fn fmt_head(
         &self,
-        keyword: &str,
+        keyword: impl ToString,
         parents: &[Type],
         fmt: &mut Formatter<'_>,
     ) -> fmt::Result {
@@ -94,7 +94,7 @@ impl TypeDef {
             write!(fmt, "{} ", vis)?;
         }
 
-        write!(fmt, "{} ", keyword)?;
+        write!(fmt, "{} ", keyword.to_string())?;
         self.ty.fmt(fmt)?;
 
         if !parents.is_empty() {
