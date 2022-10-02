@@ -100,7 +100,7 @@ impl<'a> fmt::Write for Formatter<'a> {
 }
 
 /// Format generics.
-pub fn fmt_generics(generics: &[impl ToString], fmt: &mut Formatter<'_>) -> fmt::Result {
+pub fn fmt_generics(generics: &[String], fmt: &mut Formatter<'_>) -> fmt::Result {
     if !generics.is_empty() {
         write!(fmt, "<")?;
 
@@ -108,7 +108,7 @@ pub fn fmt_generics(generics: &[impl ToString], fmt: &mut Formatter<'_>) -> fmt:
             if i != 0 {
                 write!(fmt, ", ")?
             }
-            write!(fmt, "{}", ty.to_string())?;
+            write!(fmt, "{}", ty)?;
         }
 
         write!(fmt, ">")?;

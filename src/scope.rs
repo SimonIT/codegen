@@ -1,4 +1,4 @@
-use std::fmt::{self, Debug, Write};
+use std::fmt::{self, Debug, Display, Write};
 
 use indexmap::IndexMap;
 
@@ -78,34 +78,41 @@ impl Scope {
     }
 
     /// Returns a mutable reference to a module if it is exists in this scope.
-    pub fn get_module_mut(&mut self, name: impl ToString) -> Option<&mut Module>
+    pub fn get_module_mut<Q: ?Sized>(&mut self, name: &Q) -> Option<&mut Module>
+    where
+        String: PartialEq<Q>,
     {
-        let name = name.to_string();
         self.items
             .iter_mut()
-            .find_map(|item| match item {
-                &mut Item::Module(ref mut module) if module.name == name => Some(module),
+            .filter_map(|item| match item {
+                &mut Item::Module(ref mut module) if module.name == *name => Some(module),
                 _ => None,
             })
+            .next()
     }
 
     /// Returns a mutable reference to a module if it is exists in this scope.
-    pub fn get_module(&self, name: impl ToString) -> Option<&Module>
+    pub fn get_module<Q: ?Sized>(&self, name: &Q) -> Option<&Module>
+    where
+        String: PartialEq<Q>,
     {
-        let name = name.to_string();
         self.items
             .iter()
-            .find_map(|item| match item {
-                &Item::Module(ref module) if module.name == name => Some(module),
+            .filter_map(|item| match item {
+                &Item::Module(ref module) if module.name == *name => Some(module),
                 _ => None,
             })
+            .next()
     }
 
     /// Returns a mutable reference to a module, creating it if it does
     /// not exist.
-    pub fn get_or_new_module(&mut self, name: impl ToString) -> &mut Module {
-        if self.get_module(name.to_string()).is_some() {
-            self.get_module_mut(name.to_string()).unwrap()
+    pub fn get_or_new_module<Q: ?Sized + Display>(&mut self, name: &Q) -> &mut Module
+    where
+        String: PartialEq<Q>,
+    {
+        if self.get_module(name).is_some() {
+            self.get_module_mut(name).unwrap()
         } else {
             self.new_module(name)
         }
@@ -218,11 +225,7 @@ impl Scope {
     }
 
     /// Push a new `TypeAlias`, returning a mutable reference to it.
-    pub fn new_type_alias(
-        &mut self,
-        name: impl ToString,
-        target: impl ToString,
-    ) -> &mut TypeAlias {
+    pub fn new_type_alias(&mut self, name: impl ToString, target: impl ToString) -> &mut TypeAlias {
         self.push_type_alias(TypeAlias::new(name, target));
 
         match *self.items.last_mut().unwrap() {

@@ -76,7 +76,7 @@ impl TypeDef {
 
     pub fn fmt_head(
         &self,
-        keyword: impl ToString,
+        keyword: &str,
         parents: &[Type],
         fmt: &mut Formatter<'_>,
     ) -> fmt::Result {
@@ -94,7 +94,7 @@ impl TypeDef {
             write!(fmt, "{} ", vis)?;
         }
 
-        write!(fmt, "{} ", keyword.to_string())?;
+        write!(fmt, "{} ", keyword)?;
         self.ty.fmt(fmt)?;
 
         if !parents.is_empty() {

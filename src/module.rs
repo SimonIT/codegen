@@ -1,4 +1,4 @@
-use std::fmt::{self, Write};
+use std::fmt::{self, Display, Write};
 
 use crate::docs::Docs;
 use crate::formatter::Formatter;
@@ -84,20 +84,27 @@ impl Module {
     }
 
     /// Returns a reference to a module if it is exists in this scope.
-    pub fn get_module(&self, name: impl ToString) -> Option<&Module>
+    pub fn get_module<Q: ?Sized>(&self, name: &Q) -> Option<&Module>
+    where
+        String: PartialEq<Q>,
     {
         self.scope.get_module(name)
     }
 
     /// Returns a mutable reference to a module if it is exists in this scope.
-    pub fn get_module_mut(&mut self, name: impl ToString) -> Option<&mut Module>
+    pub fn get_module_mut<Q: ?Sized>(&mut self, name: &Q) -> Option<&mut Module>
+    where
+        String: PartialEq<Q>,
     {
         self.scope.get_module_mut(name)
     }
 
     /// Returns a mutable reference to a module, creating it if it does
     /// not exist.
-    pub fn get_or_new_module(&mut self, name: impl ToString) -> &mut Module {
+    pub fn get_or_new_module<Q: ?Sized + Display>(&mut self, name: &Q) -> &mut Module
+    where
+        String: PartialEq<Q>,
+    {
         self.scope.get_or_new_module(name)
     }
 
