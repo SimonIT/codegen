@@ -11,10 +11,10 @@ pub struct Type {
 
 impl Type {
     /// Return a new type with the given name.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Type {
-            name: name.into(),
-            generics: vec![],
+            name: name.to_string(),
+            generics: Vec::new(),
         }
     }
 
@@ -36,7 +36,7 @@ impl Type {
     /// Rewrite the `Type` with the provided path
     ///
     /// TODO: Is this needed?
-    pub fn path(&self, path: &str) -> Type {
+    pub fn path(&self, path: impl ToString) -> Type {
         // TODO: This isn't really correct
         assert!(!self.name.contains("::"));
 
@@ -74,10 +74,10 @@ impl Type {
     }
 }
 
-impl<S: Into<String>> From<S> for Type {
+impl<S: ToString> From<S> for Type {
     fn from(src: S) -> Self {
         Type {
-            name: src.into(),
+            name: src.to_string(),
             generics: vec![],
         }
     }

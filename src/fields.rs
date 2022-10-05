@@ -28,7 +28,7 @@ impl Fields {
         self
     }
 
-    pub fn named<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn named<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -42,11 +42,11 @@ impl Fields {
         })
     }
 
-    pub fn new_named<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Field
+    pub fn new_named<T>(&mut self, name: impl ToString, ty: T) -> &mut Field
     where
         T: Into<Type>,
     {
-        self.named(&name.into(), ty);
+        self.named(name, ty);
         if let Fields::Named(ref mut fields) = *self {
             fields.last_mut().unwrap()
         } else {

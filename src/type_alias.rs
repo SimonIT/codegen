@@ -11,7 +11,7 @@ pub struct TypeAlias {
 }
 
 impl TypeAlias {
-    pub fn new(name: impl Into<String>, ty: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString, ty: impl ToString) -> Self {
         Self {
             type_def: TypeDef::new(name),
             ty: Type::new(ty),
@@ -31,47 +31,47 @@ impl TypeAlias {
     }
 
     /// Set the TypeAliasure visibility.
-    pub fn vis(&mut self, vis: impl Into<String>) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.type_def.vis(vis);
         self
     }
 
     /// Add a generic to the TypeAlias.
-    pub fn generic(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn generic(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.ty.generic(name);
         self
     }
 
     /// Add a `where` bound to the TypeAlias.
-    pub fn bound<T>(&mut self, name: impl Into<String>, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
-        self.type_def.bound(name.into(), ty);
+        self.type_def.bound(name, ty);
         self
     }
 
     /// Set the TypeAliasure documentation.
-    pub fn doc(&mut self, docs: impl Into<String>) -> &mut Self {
+    pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.type_def.doc(docs);
         self
     }
 
     /// Add a new type that the TypeAlias should derive.
-    pub fn derive(&mut self, name: impl Into<String>) -> &mut Self {
+    pub fn derive(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.derive(name);
         self
     }
 
     /// Specify lint attribute to supress a warning or error.
-    pub fn allow(&mut self, allow: impl Into<String>) -> &mut Self {
+    pub fn allow(&mut self, allow: impl ToString) -> &mut Self {
         self.type_def.allow(allow);
         self
     }
 
     /// Specify representation.
-    pub fn repr(&mut self, repr: impl Into<String>) -> &mut Self {
-        self.type_def.repr(repr.into());
+    pub fn repr(&mut self, repr: impl ToString) -> &mut Self {
+        self.type_def.repr(repr);
         self
     }
 

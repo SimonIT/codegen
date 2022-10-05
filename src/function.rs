@@ -55,9 +55,9 @@ pub struct Function {
 
 impl Function {
     /// Return a new function definition.
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Function {
-            name: name.into(),
+            name: name.to_string(),
             docs: None,
             allow: None,
             vis: None,
@@ -74,19 +74,19 @@ impl Function {
     }
 
     /// Set the function documentation.
-    pub fn doc(&mut self, docs: impl Into<String>) -> &mut Self {
+    pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.docs = Some(Docs::new(docs));
         self
     }
 
     /// Specify lint attribute to supress a warning or error.
-    pub fn allow(&mut self, allow: &str) -> &mut Self {
+    pub fn allow(&mut self, allow: impl ToString) -> &mut Self {
         self.allow = Some(allow.to_string());
         self
     }
 
     /// Set the function visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.vis = Some(vis.to_string());
         self
     }
@@ -122,7 +122,7 @@ impl Function {
     }
 
     /// Add a function argument.
-    pub fn arg<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn arg<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -151,7 +151,7 @@ impl Function {
     }
 
     /// Add a `where` bound to the function.
-    pub fn bound<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -198,7 +198,7 @@ impl Function {
     /// // use the "C" calling convention
     /// extern_func.extern_abi("C");
     /// ```
-    pub fn extern_abi(&mut self, abi: &str) -> &mut Self {
+    pub fn extern_abi(&mut self, abi: impl ToString) -> &mut Self {
         self.extern_abi.replace(abi.to_string());
         self
     }

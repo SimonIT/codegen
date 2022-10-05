@@ -24,12 +24,12 @@ pub struct Field {
 
 impl Field {
     /// Return a field definition with the provided name and type
-    pub fn new<T>(name: &str, ty: T) -> Self
+    pub fn new<T>(name: impl ToString, ty: T) -> Self
     where
         T: Into<Type>,
     {
         Field {
-            name: name.into(),
+            name: name.to_string(),
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
@@ -39,20 +39,20 @@ impl Field {
     }
 
     /// Set field's documentation.
-    pub fn doc(&mut self, documentation: impl Into<String>) -> &mut Self {
-        self.documentation = documentation.into();
+    pub fn doc(&mut self, documentation: impl ToString) -> &mut Self {
+        self.documentation = documentation.to_string();
         self
     }
 
     /// Set field's annotation.
-    pub fn annotation(&mut self, annotation: impl Into<String>) -> &mut Self {
-        self.annotation.push(annotation.into());
+    pub fn annotation(&mut self, annotation: impl ToString) -> &mut Self {
+        self.annotation.push(annotation.to_string());
         self
     }
 
     /// Set the visibility of the field
-    pub fn vis(&mut self, visibility: impl Into<String>) -> &mut Self {
-        self.visibility = Some(visibility.into());
+    pub fn vis(&mut self, visibility: impl ToString) -> &mut Self {
+        self.visibility = Some(visibility.to_string());
         self
     }
 }

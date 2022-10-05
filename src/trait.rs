@@ -23,15 +23,15 @@ pub struct Trait {
 
 impl Trait {
     /// Return a trait definition with the provided name
-    pub fn new(name: impl Into<String>) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Trait {
             type_def: TypeDef::new(name),
-            parents: vec![],
-            associated_consts: vec![],
-            attributes: vec![],
-            associated_tys: vec![],
-            fns: vec![],
-            macros: vec![],
+            parents: Vec::new(),
+            associated_consts: Vec::new(),
+            attributes: Vec::new(),
+            associated_tys: Vec::new(),
+            fns: Vec::new(),
+            macros: Vec::new(),
         }
     }
 
@@ -41,25 +41,25 @@ impl Trait {
     }
 
     /// Set the trait visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.type_def.vis(vis);
         self
     }
 
     /// Attr
-    pub fn attr(&mut self, attr: impl Into<String>) -> &mut Self {
-        self.attributes.push(attr.into());
+    pub fn attr(&mut self, attr: impl ToString) -> &mut Self {
+        self.attributes.push(attr.to_string());
         self
     }
 
     /// Add a generic to the trait
-    pub fn generic(&mut self, name: &str) -> &mut Self {
+    pub fn generic(&mut self, name: impl ToString) -> &mut Self {
         self.type_def.ty.generic(name);
         self
     }
 
     /// Add a `where` bound to the trait.
-    pub fn bound<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -68,7 +68,7 @@ impl Trait {
     }
 
     /// Add a macro to the trait def (e.g. `"#[async_trait]"`)
-    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+    pub fn r#macro(&mut self, r#macro: impl ToString) -> &mut Self {
         self.type_def.r#macro(r#macro);
         self
     }
@@ -83,19 +83,19 @@ impl Trait {
     }
 
     /// Set the trait documentation.
-    pub fn doc(&mut self, docs: &str) -> &mut Self {
+    pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.type_def.doc(docs);
         self
     }
 
     /// Add an associated const. Returns a mutable reference to the new
     /// associated const for futher configuration.
-    pub fn associated_const<T>(&mut self, name: impl Into<String>, ty: T) -> &mut AssociatedConst
+    pub fn associated_const<T>(&mut self, name: impl ToString, ty: T) -> &mut AssociatedConst
     where
         T: Into<Type>,
     {
         self.associated_consts.push(AssociatedConst(Bound {
-            name: name.into(),
+            name: name.to_string(),
             bound: vec![ty.into()],
         }));
 
@@ -104,7 +104,7 @@ impl Trait {
 
     /// Add an associated type. Returns a mutable reference to the new
     /// associated type for futher configuration.
-    pub fn associated_type(&mut self, name: &str) -> &mut AssociatedType {
+    pub fn associated_type(&mut self, name: impl ToString) -> &mut AssociatedType {
         self.associated_tys.push(AssociatedType(Bound {
             name: name.to_string(),
             bound: vec![],
@@ -114,7 +114,7 @@ impl Trait {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: impl Into<String>) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl ToString) -> &mut Function {
         let mut func = Function::new(name);
         func.body = None;
 

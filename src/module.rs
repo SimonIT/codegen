@@ -1,4 +1,4 @@
-use std::fmt::{self, Write};
+use std::fmt::{self, Display, Write};
 
 use crate::docs::Docs;
 use crate::formatter::Formatter;
@@ -31,7 +31,7 @@ pub struct Module {
 
 impl Module {
     /// Return a new, blank module
-    pub fn new(name: &str) -> Self {
+    pub fn new(name: impl ToString) -> Self {
         Module {
             name: name.to_string(),
             vis: None,
@@ -47,7 +47,7 @@ impl Module {
     }
 
     /// Set the module visibility.
-    pub fn vis(&mut self, vis: &str) -> &mut Self {
+    pub fn vis(&mut self, vis: impl ToString) -> &mut Self {
         self.vis = Some(vis.to_string());
         self
     }
@@ -56,14 +56,14 @@ impl Module {
     ///
     /// This results in a new `use` statement bein added to the beginning of the
     /// module.
-    pub fn import(&mut self, path: &str, ty: &str) -> &mut Self {
+    pub fn import(&mut self, path: impl ToString, ty: impl ToString) -> &mut Self {
         self.scope.import(path, ty);
         self
     }
 
     /// Add an attribute to the module.
-    pub fn attr(&mut self, attribute: impl Into<String>) -> &mut Self {
-        self.attributes.push(attribute.into());
+    pub fn attr(&mut self, attribute: impl ToString) -> &mut Self {
+        self.attributes.push(attribute.to_string());
         self
     }
 
@@ -79,7 +79,7 @@ impl Module {
     /// will return the existing definition instead.
     ///
     /// [`get_or_new_module`]: #method.get_or_new_module
-    pub fn new_module(&mut self, name: &str) -> &mut Module {
+    pub fn new_module(&mut self, name: impl ToString) -> &mut Module {
         self.scope.new_module(name)
     }
 
@@ -101,7 +101,10 @@ impl Module {
 
     /// Returns a mutable reference to a module, creating it if it does
     /// not exist.
-    pub fn get_or_new_module(&mut self, name: &str) -> &mut Module {
+    pub fn get_or_new_module<Q: ?Sized + Display>(&mut self, name: &Q) -> &mut Module
+    where
+        String: PartialEq<Q>,
+    {
         self.scope.get_or_new_module(name)
     }
 
@@ -123,7 +126,7 @@ impl Module {
     }
 
     /// Push a new struct definition, returning a mutable reference to it.
-    pub fn new_struct(&mut self, name: &str) -> &mut Struct {
+    pub fn new_struct(&mut self, name: impl ToString) -> &mut Struct {
         self.scope.new_struct(name)
     }
 
@@ -134,7 +137,7 @@ impl Module {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: &str) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl ToString) -> &mut Function {
         self.scope.new_fn(name)
     }
 
@@ -145,7 +148,7 @@ impl Module {
     }
 
     /// Push a new enum definition, returning a mutable reference to it.
-    pub fn new_enum(&mut self, name: &str) -> &mut Enum {
+    pub fn new_enum(&mut self, name: impl ToString) -> &mut Enum {
         self.scope.new_enum(name)
     }
 
@@ -156,7 +159,7 @@ impl Module {
     }
 
     /// Push a new `impl` block, returning a mutable reference to it.
-    pub fn new_impl(&mut self, target: &str) -> &mut Impl {
+    pub fn new_impl(&mut self, target: impl ToString) -> &mut Impl {
         self.scope.new_impl(target)
     }
 
@@ -167,7 +170,7 @@ impl Module {
     }
 
     /// Push a new trait
-    pub fn new_trait(&mut self, name: impl Into<String>) -> &mut Trait {
+    pub fn new_trait(&mut self, name: impl ToString) -> &mut Trait {
         self.scope.new_trait(name)
     }
 

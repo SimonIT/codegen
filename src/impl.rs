@@ -41,20 +41,20 @@ impl Impl {
     {
         Impl {
             target: target.into(),
-            generics: vec![],
+            generics: Vec::new(),
             impl_trait: None,
-            assoc_csts: vec![],
-            assoc_tys: vec![],
-            bounds: vec![],
-            fns: vec![],
-            macros: vec![],
+            assoc_csts: Vec::new(),
+            assoc_tys: Vec::new(),
+            bounds: Vec::new(),
+            fns: Vec::new(),
+            macros: Vec::new(),
         }
     }
 
     /// Add a generic to the impl block.
     ///
     /// This adds the generic for the block (`impl<T>`) and not the target type.
-    pub fn generic(&mut self, name: &str) -> &mut Self {
+    pub fn generic(&mut self, name: impl ToString) -> &mut Self {
         self.generics.push(name.to_string());
         self
     }
@@ -78,7 +78,7 @@ impl Impl {
     }
 
     /// Add a macro to the impl block (e.g. `"#[async_trait]"`)
-    pub fn r#macro(&mut self, r#macro: &str) -> &mut Self {
+    pub fn r#macro(&mut self, r#macro: impl ToString) -> &mut Self {
         self.macros.push(r#macro.to_string());
         self
     }
@@ -86,28 +86,28 @@ impl Impl {
     /// Set an associated constant.
     pub fn associate_const<T>(
         &mut self,
-        name: impl Into<String>,
+        name: impl ToString,
         ty: T,
-        value: impl Into<String>,
-        visibility: impl Into<String>,
+        value: impl ToString,
+        visibility: impl ToString,
     ) -> &mut Self
     where
         T: Into<Type>,
     {
         self.assoc_csts.push(Field {
-            name: name.into(),
+            name: name.to_string(),
             ty: ty.into(),
             documentation: String::new(),
             annotation: Vec::new(),
-            value: value.into(),
-            visibility: Some(visibility.into()),
+            value: value.to_string(),
+            visibility: Some(visibility.to_string()),
         });
 
         self
     }
 
     /// Set an associated type.
-    pub fn associate_type<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn associate_type<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -124,7 +124,7 @@ impl Impl {
     }
 
     /// Add a `where` bound to the impl block.
-    pub fn bound<T>(&mut self, name: &str, ty: T) -> &mut Self
+    pub fn bound<T>(&mut self, name: impl ToString, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
@@ -136,7 +136,7 @@ impl Impl {
     }
 
     /// Push a new function definition, returning a mutable reference to it.
-    pub fn new_fn(&mut self, name: &str) -> &mut Function {
+    pub fn new_fn(&mut self, name: impl ToString) -> &mut Function {
         self.push_fn(Function::new(name));
         self.fns.last_mut().unwrap()
     }
