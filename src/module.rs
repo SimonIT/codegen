@@ -54,10 +54,10 @@ impl Module {
 
     /// Import a type into the module's scope.
     ///
-    /// This results in a new `use` statement bein added to the beginning of the
+    /// This results in a new `use` statement being added to the beginning of the
     /// module.
-    pub fn import(&mut self, path: impl ToString, ty: impl ToString) -> &mut Self {
-        self.scope.import(path, ty);
+    pub fn import(&mut self, path: impl ToString, ty: impl ToString, alias: Option<&str>) -> &mut Self {
+        self.scope.new_import(path, ty, alias);
         self
     }
 

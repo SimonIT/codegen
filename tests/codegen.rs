@@ -373,7 +373,7 @@ fn struct_mod_import() {
     let mut scope = Scope::new();
     scope
         .new_module("foo")
-        .import("bar", "Bar")
+        .import("bar", "Bar", None)
         .new_struct("Foo")
         .field("bar", "Bar");
 
@@ -434,9 +434,9 @@ fn scoped_imports() {
     let mut scope = Scope::new();
     scope
         .new_module("foo")
-        .import("bar", "Bar")
-        .import("bar", "baz::Baz")
-        .import("bar::quux", "quuux::Quuuux")
+        .import("bar", "Bar", None)
+        .import("bar", "baz::Baz", None)
+        .import("bar::quux", "quuux::Quuuux", None)
         .new_struct("Foo")
         .field("bar", "Bar")
         .field("baz", "baz::Baz")
@@ -460,7 +460,7 @@ mod foo {
 #[test]
 fn module_mut() {
     let mut scope = Scope::new();
-    scope.new_module("foo").import("bar", "Bar");
+    scope.new_module("foo").import("bar", "Bar", None);
 
     scope
         .get_module_mut("foo")
@@ -485,7 +485,7 @@ fn get_or_new_module() {
     let mut scope = Scope::new();
     assert!(scope.get_module("foo").is_none());
 
-    scope.get_or_new_module("foo").import("bar", "Bar");
+    scope.get_or_new_module("foo").import("bar", "Bar", None);
 
     scope
         .get_or_new_module("foo")

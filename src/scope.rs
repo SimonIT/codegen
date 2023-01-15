@@ -44,7 +44,7 @@ impl Scope {
     ///
     /// This results in a new `use` statement being added to the beginning of
     /// the scope.
-    pub fn import(&mut self, path: impl ToString, ty: impl ToString) -> &mut Import {
+    pub fn new_import(&mut self, path: impl ToString, ty: impl ToString, alias: Option<&str>) -> &mut Import {
         // handle cases where the caller wants to refer to a type namespaced
         // within the containing namespace, like "a::B".
         let ty = ty.to_string();
@@ -53,7 +53,13 @@ impl Scope {
             .entry(path.to_string())
             .or_insert(IndexMap::new())
             .entry(ty.to_string())
-            .or_insert_with(|| Import::new(path, ty))
+            .or_insert_with(|| Import::new(path, ty, alias))
+    }
+
+    /// Push a new import (`use` statement) ad the beginning of the scope
+    pub fn push_import(&mut self, path: impl ToString, ty: impl ToString, alias: Option<&str>) -> &mut Self {
+        self.new_import(path, ty, alias);
+        self
     }
 
     /// Push a new module definition, returning a mutable reference to it.
