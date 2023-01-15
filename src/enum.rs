@@ -72,6 +72,12 @@ impl Enum {
         self
     }
 
+    /// Add an arbitrary attribute.
+    pub fn attr(&mut self, attribute: impl ToString) -> &mut Self {
+        self.type_def.attr(attribute.to_string());
+        self
+    }
+
     /// Add an arbitrary macro.
     pub fn r#macro(&mut self, r#macro: impl ToString) -> &mut Self {
         self.type_def.r#macro(r#macro);
