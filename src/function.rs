@@ -73,6 +73,11 @@ impl Function {
         }
     }
 
+    /// Returns the name of the function
+    pub fn name(&self) -> &String {
+        &self.name
+    }
+
     /// Set the function documentation.
     pub fn doc(&mut self, docs: impl ToString) -> &mut Self {
         self.docs = Some(Docs::new(docs));

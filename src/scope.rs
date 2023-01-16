@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fmt::{self, Debug, Display, Write};
 
 use indexmap::IndexMap;
@@ -268,22 +269,46 @@ impl Scope {
             write!(fmt, "\n")?;
         }
 
-        for (i, item) in self.items.iter().enumerate() {
-            if i != 0 {
-                write!(fmt, "\n")?;
-            }
-
+        for item in self.items.iter() {
             match *item {
-                Item::Module(ref v) => v.fmt(fmt)?,
-                Item::Struct(ref v) => v.fmt(fmt)?,
-                Item::Function(ref v) => v.fmt(false, fmt)?,
-                Item::Trait(ref v) => v.fmt(fmt)?,
-                Item::Enum(ref v) => v.fmt(fmt)?,
-                Item::Impl(ref v) => v.fmt(fmt)?,
                 Item::Raw(ref v) => {
-                    write!(fmt, "{}\n", v)?;
+                    write!(fmt, "{}\n\n", v)?;
                 }
-                Item::TypeAlias(ref v) => v.fmt(fmt)?,
+                _ => {},
+            }
+        }
+
+        let mut sorted_items = BTreeMap::<String, Vec<&Item>>::new();
+        for item in self.items.iter() {
+            match *item {
+                Item::Module(ref v) => sorted_items.entry(format!("{}-module", v.name)).or_default().push(item),
+                Item::Struct(ref v) => sorted_items.entry(format!("{}-struct", v.ty().name())).or_default().push(item),
+                Item::Function(ref v) => sorted_items.entry(format!("{}-function", v.name())).or_default().push(item),
+                Item::Trait(ref v) => sorted_items.entry(format!("{}-trait", v.ty().name())).or_default().push(item),
+                Item::Enum(ref v) => sorted_items.entry(format!("{}-enum", v.ty().name())).or_default().push(item),
+                Item::Impl(ref v) => sorted_items.entry(format!("{}-impl", v.target().name())).or_default().push(item),
+                Item::TypeAlias(ref v) => sorted_items.entry(format!("{}-impl", v.type_def().name())).or_default().push(item),
+                _ => {},
+            }
+        }
+        for key_vals in sorted_items.iter() {
+            for (item) in key_vals.1.iter() {
+                match *item {
+                    Item::Module(ref v) => v.fmt(fmt)?,
+                    Item::Struct(ref v) => v.fmt(fmt)?,
+                    Item::Function(ref v) => v.fmt(false, fmt)?,
+                    Item::Trait(ref v) => v.fmt(fmt)?,
+                    Item::Enum(ref v) => v.fmt(fmt)?,
+                    Item::Impl(ref v) => v.fmt(fmt)?,
+                    Item::TypeAlias(ref v) => v.fmt(fmt)?,
+                    _ => {}, // already printed earlier
+                }
+                match *item {
+                    Item::Raw(_) => {}
+                    _ => {
+                        write!(fmt, "\n")?;
+                    },
+                }
             }
         }
 

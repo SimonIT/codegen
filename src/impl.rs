@@ -51,6 +51,11 @@ impl Impl {
         }
     }
 
+    /// Returns the target of the impl
+    pub fn target(&self) -> &Type {
+        &self.target
+    }
+
     /// Add a generic to the impl block.
     ///
     /// This adds the generic for the block (`impl<T>`) and not the target type.

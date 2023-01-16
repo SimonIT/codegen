@@ -75,7 +75,7 @@ impl Module {
     /// which it is defined, pushing a module whose name is already defined
     /// in this scope will cause this function to panic.
     ///
-    /// In many cases, the [`get_or_new_module`] function is preferrable, as it
+    /// In many cases, the [`get_or_new_module`] function is preferable, as it
     /// will return the existing definition instead.
     ///
     /// [`get_or_new_module`]: #method.get_or_new_module
@@ -116,7 +116,7 @@ impl Module {
     /// which it is defined, pushing a module whose name is already defined
     /// in this scope will cause this function to panic.
     ///
-    /// In many cases, the [`get_or_new_module`] function is preferrable, as it will
+    /// In many cases, the [`get_or_new_module`] function is preferable, as it will
     /// return the existing definition instead.
     ///
     /// [`get_or_new_module`]: #method.get_or_new_module
