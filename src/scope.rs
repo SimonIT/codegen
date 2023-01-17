@@ -263,12 +263,6 @@ impl Scope {
 
     /// Formats the scope using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
-        self.fmt_imports(fmt)?;
-
-        if !self.imports.is_empty() {
-            write!(fmt, "\n")?;
-        }
-
         for item in self.items.iter() {
             match *item {
                 Item::Raw(ref v) => {
@@ -276,6 +270,12 @@ impl Scope {
                 }
                 _ => {},
             }
+        }
+
+        self.fmt_imports(fmt)?;
+
+        if !self.imports.is_empty() {
+            write!(fmt, "\n")?;
         }
 
         let mut sorted_items = BTreeMap::<String, Vec<&Item>>::new();
@@ -287,7 +287,7 @@ impl Scope {
                 Item::Trait(ref v) => sorted_items.entry(format!("{}-trait", v.ty().name())).or_default().push(item),
                 Item::Enum(ref v) => sorted_items.entry(format!("{}-enum", v.ty().name())).or_default().push(item),
                 Item::Impl(ref v) => sorted_items.entry(format!("{}-impl", v.target().name())).or_default().push(item),
-                Item::TypeAlias(ref v) => sorted_items.entry(format!("{}-impl", v.type_def().name())).or_default().push(item),
+                Item::TypeAlias(ref v) => sorted_items.entry(format!("{}-alias", v.type_def().name())).or_default().push(item),
                 _ => {},
             }
         }
@@ -367,4 +367,24 @@ impl Scope {
 
         Ok(())
     }
+
+    /// Merge two scopes together
+    pub fn append(&mut self, other: &Self) -> &Self {
+        self.docs = match (self.docs.as_ref(), other.docs.as_ref()) {
+            (Some(doc_a), Some(doc_b)) => Some(Docs::new("").append(doc_a.to_str()).append(doc_b.to_str()).clone()),
+            (Some(doc_a), None) => Some(doc_a.clone()),
+            (None, Some(doc_b)) => Some(doc_b.clone()),
+            (None, None) => None,
+        };
+        for (key, value) in other.imports.iter() {
+            self.imports
+                .entry(key.to_string())
+                .or_insert(IndexMap::new())
+                .extend(value.iter().map(|(a,b)| (a.clone(), b.clone())));
+        }
+
+        self.items.extend(other.items.iter().cloned());
+        self
+    }
 }
+

@@ -25,4 +25,13 @@ impl Docs {
 
         Ok(())
     }
+
+    pub fn append(&mut self, other: impl ToString) -> &mut Self {
+        self.docs.push_str(&other.to_string());
+        self
+    }
+
+    pub fn to_str(&self) -> &str {
+        &self.docs
+    }
 }
