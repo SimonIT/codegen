@@ -1,4 +1,5 @@
 use std::fmt::{self, Write};
+use regex::Regex;
 
 use crate::formatter::Formatter;
 
@@ -9,12 +10,34 @@ pub struct Type {
     generics: Vec<Type>,
 }
 
+fn split_name_and_generic(ty: &str) -> Type {
+    let re = Regex::new(r"([^<]*)<(.*)>").unwrap();
+    if let Some(captures) = re.captures(ty) {
+        let type_name = captures.get(1).unwrap().as_str();
+        let generic = captures.get(2).unwrap().as_str();
+
+        let mut new_type = Type::new(type_name);
+
+        // TODO: this won't work if the generic contains multiple fields
+        // ex: Map<u8, u8>
+        // that can't be solved with regex, so I just leave this as a future problem
+        new_type.generic(generic);
+        new_type
+    } else {
+        panic!("Malformed type: {}", ty);
+    }
+}
 impl Type {
     /// Return a new type with the given name.
     pub fn new(name: impl ToString) -> Self {
-        Type {
-            name: name.to_string(),
-            generics: Vec::new(),
+        let name = name.to_string();
+        if name.contains('<') {
+            split_name_and_generic(&name)
+        } else {
+            Type {
+                name,
+                generics: Vec::new(),
+            }
         }
     }
 
@@ -104,5 +127,28 @@ impl<S: ToString> From<S> for Type {
 impl<'a> From<&'a Type> for Type {
     fn from(src: &'a Type) -> Self {
         src.clone()
+    }
+}
+
+#[test]
+fn parse_type() {
+    {
+        let ty = Type::new("u8");
+        assert_eq!(ty.name, "u8");
+        assert!(ty.generics.is_empty());
+    }
+}
+
+#[test]
+fn parse_generic() {
+    {
+        let ty = Type::new("Vec<u8>");
+        assert_eq!(ty.name, "Vec");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "u8");
+    }
+    {
+        let ty = Type::new("Vec<Vec<u8>>");
+        assert_eq!(ty.name, "Vec");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "Vec<u8>");
     }
 }

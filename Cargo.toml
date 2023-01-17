@@ -16,3 +16,4 @@ edition = "2021"
 
 [dependencies]
 indexmap = "1.0.2"
+regex = "1.7.1"
