@@ -343,30 +343,42 @@ impl Scope {
             }
         }
 
-        let mut tys = vec![];
+        let mut alias_tys = vec![];
+        let mut simple_tys = vec![];
 
         // Loop over all visibilities and format the associated imports
         for vis in &visibilities {
             for (path, imports) in &self.imports {
-                tys.clear();
+                alias_tys.clear();
+                simple_tys.clear();
 
                 for (ty, import) in imports {
                     if *vis == import.vis {
-                        tys.push(ty);
+                        match import.alias.as_ref() {
+                            None => { simple_tys.push(ty); }
+                            Some(alias) => { alias_tys.push(format!("{} as {}", ty, alias)); }
+                        }
                     }
                 }
 
-                if !tys.is_empty() {
+                for ty in alias_tys.iter() {
+                    if let Some(ref vis) = *vis {
+                        write!(fmt, "{} ", vis)?;
+                    }
+
+                    write!(fmt, "use {}::{};\n", path, ty)?;
+                }
+                if !simple_tys.is_empty() {
                     if let Some(ref vis) = *vis {
                         write!(fmt, "{} ", vis)?;
                     }
 
                     write!(fmt, "use {}::", path)?;
 
-                    if tys.len() > 1 {
+                    if simple_tys.len() > 1 {
                         write!(fmt, "{{")?;
 
-                        for (i, ty) in tys.iter().enumerate() {
+                        for (i, ty) in simple_tys.iter().enumerate() {
                             if i != 0 {
                                 write!(fmt, ", ")?;
                             }
@@ -374,8 +386,8 @@ impl Scope {
                         }
 
                         write!(fmt, "}};\n")?;
-                    } else if tys.len() == 1 {
-                        write!(fmt, "{};\n", tys[0])?;
+                    } else if simple_tys.len() == 1 {
+                        write!(fmt, "{};\n", simple_tys[0])?;
                     }
                 }
             }
