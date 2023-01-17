@@ -244,8 +244,6 @@ fn type_alias() {
 
         let mut str = String::new();
         impl_type.fmt(&mut Formatter::new(&mut str)).unwrap();
-        println!("{:?}", str);
-        println!("{:?}", impl_type.key_for_sorting());
         assert_eq!(impl_type.key_for_sorting().name(), "Bar");
     }
 }
