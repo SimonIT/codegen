@@ -24,7 +24,7 @@ impl TypeAlias {
         self.type_def.fmt_head("type", &[], fmt)?;
         write!(fmt, " = ")?;
         self.ty.fmt(fmt)?;
-        write!(fmt, ";")?;
+        write!(fmt, ";\n")?;
         Ok(())
     }
 
