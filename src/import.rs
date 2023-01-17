@@ -36,3 +36,15 @@ impl Import {
         self
     }
 }
+
+#[test]
+fn parse_alias() {
+    {
+        let import = Import::new("foo", "Bar", Some("Baz"));
+        assert_eq!(import.line, "foo::Bar as Baz");
+    }
+    {
+        let import = Import::new("foo", "Bar", None);
+        assert_eq!(import.line, "foo::Bar");
+    }
+}

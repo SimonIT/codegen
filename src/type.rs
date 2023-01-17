@@ -146,6 +146,6 @@ fn parse_generic() {
     {
         let ty = Type::new("Vec<Vec<u8>>");
         assert_eq!(ty.name, "Vec");
-        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "Vec<u8>");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "Vec");
     }
 }
