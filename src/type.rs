@@ -23,6 +23,19 @@ impl Type {
         &self.name
     }
 
+    /// Returns the name of the type
+    pub fn generics(&self) -> &Vec<Type> {
+        &self.generics
+    }
+
+    /// Returns the key for sorting
+    pub fn key_for_sorting(&self) -> &str {
+        match self.name.rfind("::") {
+            Some(index) => &self.name[index + 2..],
+            None => &self.name,
+        }
+    }
+
     /// Add a generic to the type.
     pub fn generic<T>(&mut self, ty: T) -> &mut Self
     where

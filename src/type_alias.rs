@@ -11,12 +11,15 @@ pub struct TypeAlias {
 }
 
 impl TypeAlias {
+    /// Create a new type alias (type Foo = Bar)
     pub fn new(name: impl ToString, ty: impl ToString) -> Self {
         Self {
             type_def: TypeDef::new(name),
             ty: Type::new(ty),
         }
     }
+
+    /// Format a TypeAlias for usage in Rust
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
         self.type_def.fmt_head("type", &[], fmt)?;
         write!(fmt, " = ")?;

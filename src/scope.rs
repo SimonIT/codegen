@@ -263,51 +263,67 @@ impl Scope {
 
     /// Formats the scope using the given formatter.
     pub fn fmt(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
-        for item in self.items.iter() {
-            match *item {
-                Item::Raw(ref v) => {
-                    write!(fmt, "{}\n\n", v)?;
+        {
+            let mut has_raw = false;
+            for item in self.items.iter() {
+                if let Item::Raw(ref v) = *item {
+                    writeln!(fmt, "{}", v)?;
+                    has_raw = true;
                 }
-                _ => {},
+            }
+            if has_raw {
+                writeln!(fmt)?;
             }
         }
 
-        self.fmt_imports(fmt)?;
-
-        if !self.imports.is_empty() {
-            write!(fmt, "\n")?;
+        {
+            self.fmt_imports(fmt)?;
+            if !self.imports.is_empty() {
+                writeln!(fmt)?;
+            }
         }
 
         let mut sorted_items = BTreeMap::<String, Vec<&Item>>::new();
         for item in self.items.iter() {
             match *item {
                 Item::Module(ref v) => sorted_items.entry(format!("{}-module", v.name)).or_default().push(item),
-                Item::Struct(ref v) => sorted_items.entry(format!("{}-struct", v.ty().name())).or_default().push(item),
+                // note: purposely use `astruct` instead of `struct` to make sure the struct always comes first in alphabetical order
+                Item::Struct(ref v) => sorted_items.entry(format!("{}-astruct", v.ty().key_for_sorting())).or_default().push(item),
                 Item::Function(ref v) => sorted_items.entry(format!("{}-function", v.name())).or_default().push(item),
-                Item::Trait(ref v) => sorted_items.entry(format!("{}-trait", v.ty().name())).or_default().push(item),
-                Item::Enum(ref v) => sorted_items.entry(format!("{}-enum", v.ty().name())).or_default().push(item),
-                Item::Impl(ref v) => sorted_items.entry(format!("{}-impl", v.target().name())).or_default().push(item),
-                Item::TypeAlias(ref v) => sorted_items.entry(format!("{}-alias", v.type_def().name())).or_default().push(item),
+                Item::Trait(ref v) => sorted_items.entry(format!("{}-trait", v.ty().key_for_sorting())).or_default().push(item),
+                Item::Enum(ref v) => sorted_items.entry(format!("{}-enum", v.ty().key_for_sorting())).or_default().push(item),
+                Item::Impl(ref v) => sorted_items.entry(format!("{}-impl", v.key_for_sorting().key_for_sorting())).or_default().push(item),
+                Item::TypeAlias(ref v) => sorted_items.entry(format!("{}-alias", v.type_def().key_for_sorting())).or_default().push(item),
                 _ => {},
             }
         }
-        for key_vals in sorted_items.iter() {
-            for (item) in key_vals.1.iter() {
-                match *item {
-                    Item::Module(ref v) => v.fmt(fmt)?,
-                    Item::Struct(ref v) => v.fmt(fmt)?,
-                    Item::Function(ref v) => v.fmt(false, fmt)?,
-                    Item::Trait(ref v) => v.fmt(fmt)?,
-                    Item::Enum(ref v) => v.fmt(fmt)?,
-                    Item::Impl(ref v) => v.fmt(fmt)?,
-                    Item::TypeAlias(ref v) => v.fmt(fmt)?,
-                    _ => {}, // already printed earlier
-                }
-                match *item {
-                    Item::Raw(_) => {}
-                    _ => {
-                        write!(fmt, "\n")?;
-                    },
+
+        {
+            let mut has_item = false;
+            for key_vals in sorted_items.iter() {
+                for item in key_vals.1.iter() {
+                    match *item {
+                        Item::Raw(_) => {}
+                        _ => {
+                            if has_item {
+                                writeln!(fmt)?;
+                            } else {
+                                has_item = true;
+                            }
+                        },
+                    }
+
+                    match *item {
+                        Item::Module(ref v) => v.fmt(fmt)?,
+                        Item::Struct(ref v) => v.fmt(fmt)?,
+                        Item::Function(ref v) => v.fmt(false, fmt)?,
+                        Item::Trait(ref v) => v.fmt(fmt)?,
+                        Item::Enum(ref v) => v.fmt(fmt)?,
+                        Item::Impl(ref v) => v.fmt(fmt)?,
+                        Item::TypeAlias(ref v) => v.fmt(fmt)?,
+                        _ => {}, // already printed earlier
+                    }
+                    
                 }
             }
         }

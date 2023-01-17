@@ -56,6 +56,21 @@ impl Impl {
         &self.target
     }
 
+    /// Returns the key for sorting
+    pub fn key_for_sorting(&self) -> &Type {
+        if self.target.generics().is_empty() || self.impl_trait.is_none() {
+            &self.target
+        } else {
+            let impl_type = self.impl_trait.as_ref().unwrap();
+            if impl_type.name() == "From" {
+                impl_type.generics().get(0).unwrap()
+            } else {
+                impl_type
+            }
+        }
+    }
+
+
     /// Add a generic to the impl block.
     ///
     /// This adds the generic for the block (`impl<T>`) and not the target type.
@@ -203,5 +218,34 @@ impl Impl {
 
             Ok(())
         })
+    }
+}
+
+#[test]
+fn type_alias() {
+    {
+        let mut generic_type = Type::new("From");
+        generic_type.generic("Bar");
+
+        let mut impl_type = Impl::new("Foo");
+        impl_type.impl_trait(generic_type);
+
+        let mut str = String::new();
+        impl_type.fmt(&mut Formatter::new(&mut str)).unwrap();
+        assert_eq!(impl_type.key_for_sorting().name(), "Foo");
+    }
+    {
+        let mut generic_type = Type::new("From");
+        generic_type.generic("Bar");
+
+        let mut impl_type = Impl::new("Vec");
+        impl_type.target_generic("Foo");
+        impl_type.impl_trait(generic_type);
+
+        let mut str = String::new();
+        impl_type.fmt(&mut Formatter::new(&mut str)).unwrap();
+        println!("{:?}", str);
+        println!("{:?}", impl_type.key_for_sorting());
+        assert_eq!(impl_type.key_for_sorting().name(), "Bar");
     }
 }

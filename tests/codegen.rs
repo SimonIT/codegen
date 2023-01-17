@@ -138,13 +138,13 @@ fn two_structs() {
     scope.new_struct("Bar").field("hello", "World");
 
     let expect = r#"
+struct Bar {
+    hello: World,
+}
+
 struct Foo {
     one: usize,
     two: String,
-}
-
-struct Bar {
-    hello: World,
 }"#;
 
     assert_eq!(scope.to_string(), &expect[1..]);
