@@ -117,10 +117,7 @@ impl Type {
 
 impl<S: ToString> From<S> for Type {
     fn from(src: S) -> Self {
-        Type {
-            name: src.to_string(),
-            generics: vec![],
-        }
+        Type::new(src)
     }
 }
 
