@@ -9,7 +9,7 @@ use crate::r#type::Type;
 #[derive(Debug, Clone)]
 pub enum Fields {
     Empty,
-    Tuple(Vec<Type>),
+    Tuple((Option<String> /* visibility */, Vec<Type>)),
     Named(Vec<Field>),
 }
 
@@ -54,16 +54,16 @@ impl Fields {
         }
     }
 
-    pub fn tuple<T>(&mut self, ty: T) -> &mut Self
+    pub fn tuple<T>(&mut self, vis: Option<String>, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
         match *self {
             Fields::Empty => {
-                *self = Fields::Tuple(vec![ty.into()]);
+                *self = Fields::Tuple((vis, vec![ty.into()]));
             }
             Fields::Tuple(ref mut fields) => {
-                fields.push(ty.into());
+                fields.1.push(ty.into());
             }
             _ => panic!("field list is tuple"),
         }
@@ -100,11 +100,14 @@ impl Fields {
                 })?;
             }
             Fields::Tuple(ref tys) => {
-                assert!(!tys.is_empty());
+                assert!(!tys.1.is_empty());
+                if let Some(vis) = tys.0.as_ref() {
+                    write!(fmt, "{} ", vis)?;
+                }
 
                 write!(fmt, "(")?;
 
-                for (i, ty) in tys.iter().enumerate() {
+                for (i, ty) in tys.1.iter().enumerate() {
                     if i != 0 {
                         write!(fmt, ", ")?;
                     }
@@ -117,5 +120,17 @@ impl Fields {
         }
 
         Ok(())
+    }
+}
+
+#[test]
+fn parse_generic() {
+    {
+        let mut fields = Fields::Empty;
+        fields.tuple(Some("pub(crate)".to_string()), "Vec<u8>");
+
+        let mut ret = String::new();
+        fields.fmt(&mut Formatter::new(&mut ret)).unwrap();
+        assert_eq!(ret, "pub(crate) (Vec<u8>)");
     }
 }

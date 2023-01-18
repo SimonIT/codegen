@@ -35,7 +35,7 @@ impl Variant {
 
     /// Add a tuple field to the variant.
     pub fn tuple(&mut self, ty: impl ToString) -> &mut Self {
-        self.fields.tuple(ty);
+        self.fields.tuple(None, ty);
         self
     }
 

@@ -123,11 +123,11 @@ impl Struct {
     ///
     /// A struct can either set tuple fields with this function or named fields
     /// with `field`, but not both.
-    pub fn tuple_field<T>(&mut self, ty: T) -> &mut Self
+    pub fn tuple_field<T>(&mut self, vis: Option<String>, ty: T) -> &mut Self
     where
         T: Into<Type>,
     {
-        self.fields.tuple(ty);
+        self.fields.tuple(vis, ty);
         self
     }
 
