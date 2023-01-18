@@ -1,5 +1,4 @@
 use std::fmt::{self, Write};
-use regex::Regex;
 
 use crate::formatter::Formatter;
 
@@ -10,21 +9,24 @@ pub struct Type {
     generics: Vec<Type>,
 }
 
-fn split_name_and_generic(ty: &str) -> Type {
-    let re = Regex::new(r"([^<]*)<(.*)>").unwrap();
-    if let Some(captures) = re.captures(ty) {
-        let type_name = captures.get(1).unwrap().as_str();
-        let generic = captures.get(2).unwrap().as_str();
+fn split_name_and_generic(ast: &syn::Type) -> Type {
+    match ast {
+        syn::Type::Path(syn::TypePath { path, .. }) => {
+            let segments = &path.segments;
+            let base_type = segments.first().unwrap().ident.to_string();
+            let mut new_type = Type::new(&base_type);
 
-        let mut new_type = Type::new(type_name);
-
-        // TODO: this won't work if the generic contains multiple fields
-        // ex: Map<u8, u8>
-        // that can't be solved with regex, so I just leave this as a future problem
-        new_type.generic(generic);
-        new_type
-    } else {
-        panic!("Malformed type: {}", ty);
+            if let syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments { args, .. }) = &segments.first().unwrap().arguments {
+                for arg in args.iter() {
+                    if let syn::GenericArgument::Type(t) = arg {
+                        let generic_type = split_name_and_generic(t);
+                        new_type.generic(generic_type);
+                    }
+                }
+            };
+            new_type
+        }
+        _ => unreachable!(),
     }
 }
 impl Type {
@@ -32,7 +34,7 @@ impl Type {
     pub fn new(name: impl ToString) -> Self {
         let name = name.to_string();
         if name.contains('<') {
-            split_name_and_generic(&name)
+            split_name_and_generic(&syn::parse_str(&name).unwrap())
         } else {
             Type {
                 name,
@@ -141,11 +143,25 @@ fn parse_generic() {
     {
         let ty = Type::new("Vec<u8>");
         assert_eq!(ty.name, "Vec");
-        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "u8");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "u8");
     }
     {
         let ty = Type::new("Vec<Vec<u8>>");
         assert_eq!(ty.name, "Vec");
-        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(""), "Vec");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "Vec");
+    }
+    {
+        let ty = Type::new("BTreeMap<u8, u8>");
+        assert_eq!(ty.name, "BTreeMap");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "u8 u8");
+    }
+    {
+        let ty = Type::new("BTreeMap<Vec<u8>, BTreeMap<u64, String>>");
+        assert_eq!(ty.name, "BTreeMap");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "Vec BTreeMap");
+
+        let mut ret = String::new();
+        ty.fmt(&mut Formatter::new(&mut ret)).unwrap();
+        assert_eq!(ret, "BTreeMap<Vec<u8>, BTreeMap<u64, String>>");
     }
 }
