@@ -13,20 +13,32 @@ fn split_name_and_generic(ast: &syn::Type) -> Type {
     match ast {
         syn::Type::Path(syn::TypePath { path, .. }) => {
             let segments = &path.segments;
-            let base_type = segments.first().unwrap().ident.to_string();
+            let base_type = segments.iter().map(|seg| seg.ident.to_string()).collect::<Vec<String>>().join("::");
             let mut new_type = Type::new(&base_type);
 
-            if let syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments { args, .. }) = &segments.first().unwrap().arguments {
+            if let syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments { args, .. }) = &segments.last().unwrap().arguments {
                 for arg in args.iter() {
                     if let syn::GenericArgument::Type(t) = arg {
                         let generic_type = split_name_and_generic(t);
                         new_type.generic(generic_type);
+                    } else {
+                        // this isn't correct, but properly parsing the full AST is too tedious and abandoning early here is good enough
+                        return Type {
+                            name: quote::quote! { #ast }.to_string(),
+                            generics: vec![]
+                        }
                     }
                 }
             };
             new_type
         }
-        _ => unreachable!(),
+        _ => {
+            // this isn't correct, but properly parsing the full AST is too tedious and abandoning early here is good enough
+            Type {
+                name: quote::quote! { #ast }.to_string(),
+                generics: vec![]
+            }
+        },
     }
 }
 impl Type {
@@ -146,6 +158,11 @@ fn parse_generic() {
         assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "u8");
     }
     {
+        let ty = Type::new("foo::Vec<u8>");
+        assert_eq!(ty.name, "foo::Vec");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "u8");
+    }
+    {
         let ty = Type::new("Vec<Vec<u8>>");
         assert_eq!(ty.name, "Vec");
         assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "Vec");
@@ -163,5 +180,10 @@ fn parse_generic() {
         let mut ret = String::new();
         ty.fmt(&mut Formatter::new(&mut ret)).unwrap();
         assert_eq!(ret, "BTreeMap<Vec<u8>, BTreeMap<u64, String>>");
+    }
+    {
+        let ty = Type::new("Result<&'a mut Foo<Bar>>");
+        assert_eq!(ty.name, "Result");
+        assert_eq!(ty.generics.iter().map(|generic| generic.name().as_str()).collect::<Vec<&str>>().join(" "), "& 'a mut Foo < Bar >");
     }
 }
