@@ -9,7 +9,7 @@ use crate::r#type::Type;
 #[derive(Debug, Clone)]
 pub enum Fields {
     Empty,
-    Tuple((Option<String> /* visibility */, Vec<Type>)),
+    Tuple(Vec<(Option<String> /* visibility */, Type)>),
     Named(Vec<Field>),
 }
 
@@ -60,10 +60,10 @@ impl Fields {
     {
         match *self {
             Fields::Empty => {
-                *self = Fields::Tuple((vis, vec![ty.into()]));
+                *self = Fields::Tuple(vec![(vis, ty.into())]);
             }
             Fields::Tuple(ref mut fields) => {
-                fields.1.push(ty.into());
+                fields.push((vis, ty.into()));
             }
             _ => panic!("field list is tuple"),
         }
@@ -100,18 +100,17 @@ impl Fields {
                 })?;
             }
             Fields::Tuple(ref tys) => {
-                assert!(!tys.1.is_empty());
-                if let Some(vis) = tys.0.as_ref() {
-                    write!(fmt, "{} ", vis)?;
-                }
-
+                assert!(!tys.is_empty());
                 write!(fmt, "(")?;
 
-                for (i, ty) in tys.1.iter().enumerate() {
+                for (i, ty) in tys.iter().enumerate() {
                     if i != 0 {
                         write!(fmt, ", ")?;
                     }
-                    ty.fmt(fmt)?;
+                    if let Some(vis) = ty.0.as_ref() {
+                        write!(fmt, "{} ", vis)?;
+                    }
+                    ty.1.fmt(fmt)?;
                 }
 
                 write!(fmt, ")")?;
@@ -131,6 +130,16 @@ fn parse_generic() {
 
         let mut ret = String::new();
         fields.fmt(&mut Formatter::new(&mut ret)).unwrap();
-        assert_eq!(ret, "pub(crate) (Vec<u8>)");
+        assert_eq!(ret, "(pub(crate) Vec<u8>)");
+    }
+
+    {
+        let mut fields = Fields::Empty;
+        fields.tuple(Some("pub(crate)".to_string()), "Vec<u8>");
+        fields.tuple(Some("pub".to_string()), "Vec<u16>");
+
+        let mut ret = String::new();
+        fields.fmt(&mut Formatter::new(&mut ret)).unwrap();
+        assert_eq!(ret, "(pub(crate) Vec<u8>, pub Vec<u16>)");
     }
 }
