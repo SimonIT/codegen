@@ -73,6 +73,12 @@ impl Trait {
         self
     }
 
+    /// Add a cfg_attr to include attributes based on a configuration predicate
+    pub fn cfg_attr(&mut self, cfg_attr: impl ToString) -> &mut Self {
+        self.type_def.cfg_attr(cfg_attr);
+        self
+    }
+
     /// Add a parent trait.
     pub fn parent<T>(&mut self, ty: T) -> &mut Self
     where

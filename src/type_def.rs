@@ -18,6 +18,7 @@ pub struct TypeDef {
     repr: Option<String>,
     bounds: Vec<Bound>,
     macros: Vec<String>,
+    cfg_attrs: Vec<String>,
 }
 
 impl TypeDef {
@@ -33,6 +34,7 @@ impl TypeDef {
             repr: None,
             bounds: Vec::new(),
             macros: Vec::new(),
+            cfg_attrs: Vec::new(),
         }
     }
 
@@ -74,6 +76,10 @@ impl TypeDef {
         self.repr = Some(repr.to_string());
     }
 
+    pub fn cfg_attr(&mut self, cfg_attr: impl ToString) {
+        self.cfg_attrs.push(cfg_attr.to_string());
+    }
+
     pub fn fmt_head(
         &self,
         keyword: &str,
@@ -89,6 +95,7 @@ impl TypeDef {
         self.fmt_repr(fmt)?;
         self.fmt_attributes(fmt)?;
         self.fmt_macros(fmt)?;
+        self.fmt_cfg_attrs(fmt)?;
 
         if let Some(ref vis) = self.vis {
             write!(fmt, "{} ", vis)?;
@@ -159,6 +166,14 @@ impl TypeDef {
         for m in self.macros.iter() {
             write!(fmt, "{}\n", m)?;
         }
+        Ok(())
+    }
+
+    fn fmt_cfg_attrs(&self, fmt: &mut Formatter<'_>) -> fmt::Result {
+        for attr in &self.cfg_attrs {
+            write!(fmt, "#[cfg_attr({})]\n", attr)?;
+        }
+
         Ok(())
     }
 }

@@ -84,6 +84,12 @@ impl Enum {
         self
     }
 
+    /// Add a cfg_attr to include attributes based on a configuration predicate
+    pub fn cfg_attr(&mut self, cfg_attr: impl ToString) -> &mut Self {
+        self.type_def.cfg_attr(cfg_attr);
+        self
+    }
+
     /// Push a variant to the enum, returning a mutable reference to it.
     pub fn new_variant(&mut self, name: impl ToString) -> &mut Variant {
         self.push_variant(Variant::new(name.to_string()));
